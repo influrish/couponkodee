@@ -70,15 +70,6 @@
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.3"
   },
-  "resolutions": {
-    "esbuild": "0.25.0",
-    "on-headers": "1.1.0",
-    "compression": "1.8.1"
-  },
-  "overrides": {
-    "esbuild": "0.25.0",
-    "on-headers": "1.1.0"
-  },
   "engines": {
     "node": ">=20.9.0",
     "pnpm": "^9 || ^10"
