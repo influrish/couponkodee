@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#111111"/>
+  <g transform="translate(36, 40)">
+    <!-- Leaping Puma Silhouette -->
+    <path fill="#FFFFFF" d="M112 18c-3-2-7-3-11-2l-18 6c-3 1-8 2-12 1-7-2-12-8-14-15-1-4-4-7-8-7-4 0-7 3-8 7-2 8-8 14-16 16-4 1-8 0-11-1L16 18c-4-1-8 0-11 2-4 3-5 8-3 12l8 18c4 9 12 16 22 18l24 5c5 1 9 4 12 8l10 14c3 4 8 6 13 6 6 0 11-3 14-8l12-22c3-6 9-10 16-12l10-3c5-1 8-6 7-11-1-5-6-9-11-7z"/>
+  </g>
+  <text x="100" y="160" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">PUMA</text>
+</svg>

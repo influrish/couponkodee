@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="boots-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="50%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="boots-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="100%" stop-color="#facc15"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#boots-bg)"/>
+  
+  <circle cx="490" cy="110" r="100" fill="#34d399" opacity="0.2"/>
+
+  <!-- Right Graphic: Perfume bottle / beauty -->
+  <g transform="translate(440, 50)">
+    <rect x="25" y="40" width="60" height="85" rx="12" fill="#FFFFFF" opacity="0.95"/>
+    <rect x="35" y="20" width="40" height="20" rx="4" fill="#facc15"/>
+    <circle cx="55" cy="12" r="6" fill="#facc15"/>
+    <text x="55" y="85" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#047857" text-anchor="middle">BOOTS</text>
+    <text x="55" y="102" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#64748b" text-anchor="middle">PARFUM</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="195" height="26" rx="13" fill="#065f46"/>
+    <circle cx="14" cy="13" r="4" fill="#facc15"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">HEALTH &amp; BEAUTY FEST</text>
+    <text x="165" y="18" font-size="14">🇬🇧</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    BUY 1 GET 1 HALF PRICE
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#a7f3d0">
+    Luxury Skincare, Designer Fragrances, Cosmetics &amp; Vitamins
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="250" height="42" rx="10" fill="url(#boots-gold)"/>
+    <text x="125" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#064e3b" text-anchor="middle" letter-spacing="0.5">
+      BOGO 50% ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#6ee7b7">
+    ★ Boots Advantage Card Points &#8226; Free Click &amp; Collect across UK
+  </text>
+</svg>
+

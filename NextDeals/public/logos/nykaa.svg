@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#FC2779"/>
+  <g transform="translate(20, 68)">
+    <text x="80" y="50" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="38" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">NYKAA</text>
+    <polygon points="145,15 148,25 158,28 148,31 145,41 142,31 132,28 142,25" fill="#FFE11B"/>
+  </g>
+</svg>

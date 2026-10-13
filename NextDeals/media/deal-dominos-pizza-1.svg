@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+      <defs>
+        <linearGradient id="bg-dominos" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0f172a"/>
+          <stop offset="100%" stop-color="#006491"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#bg-dominos)"/>
+      <g transform="translate(150, 40)">
+        <path d="M50 0 L100 120 C70 135, 30 135, 0 120 Z" fill="#f59e0b"/>
+        <path d="M0 120 C30 135, 70 135, 100 120 L96 110 C68 125, 32 125, 4 110 Z" fill="#b45309"/>
+        <circle cx="50" cy="55" r="10" fill="#dc2626"/>
+        <circle cx="35" cy="85" r="9" fill="#dc2626"/>
+        <circle cx="65" cy="90" r="9" fill="#dc2626"/>
+      </g>
+      <rect x="80" y="170" width="240" height="42" rx="21" fill="#e11d48"/>
+      <text x="200" y="197" font-family="system-ui, sans-serif" font-weight="900" font-size="18" fill="#FFFFFF" text-anchor="middle">BUY 1 GET 1 FREE</text>
+    </svg>

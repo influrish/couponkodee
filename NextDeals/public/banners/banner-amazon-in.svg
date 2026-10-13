@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="amz-in-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="45%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <linearGradient id="amz-in-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#amz-in-bg)"/>
+  <circle cx="510" cy="50" r="140" fill="#f59e0b" opacity="0.15"/>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="185" height="26" rx="13" fill="#334155"/>
+    <circle cx="14" cy="13" r="4" fill="#10b981"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#f8fafc" letter-spacing="0.5">GREAT SAVINGS DAYS</text>
+    <text x="155" y="18" font-size="14">🇮🇳</text>
+  </g>
+
+  <!-- Right Pill -->
+  <g transform="translate(420, 28)">
+    <rect width="145" height="26" rx="6" fill="#0284c7"/>
+    <text x="72" y="17" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#FFFFFF" text-anchor="middle">AMAZON PRIME</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    GREAT INDIAN FESTIVAL DEALS
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#94a3b8">
+    Massive Price Drops on 5G Mobiles, Electronics, Pantry &amp; Fashion
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#amz-in-gold)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="0.5">
+      FLAT 25% OFF ON ORDERS
+    </text>
+  </g>
+
+  <!-- Amazon Smile Arrow -->
+  <g transform="translate(440, 110)">
+    <rect x="20" y="15" width="80" height="75" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-width="2.5"/>
+    <text x="60" y="58" font-family="system-ui, sans-serif" font-size="22" font-weight="900" fill="#f59e0b" text-anchor="middle">₹</text>
+    <path d="M15 102 Q60 125 105 102" stroke="#f59e0b" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <path d="M97 96 L107 102 L100 112" stroke="#f59e0b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#38bdf8">
+    ⚡ 10% Instant Bank Discount on SBI &amp; ICICI &#8226; Verified India Voucher
+  </text>
+</svg>
+

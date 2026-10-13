@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#0096D6"/>
+  <circle cx="100" cy="100" r="72" fill="#0096D6"/>
+  <g transform="translate(58, 48) skewX(-20)">
+    <!-- HP signature stripes -->
+    <rect x="14" y="12" width="10" height="78" fill="#FFFFFF" rx="4"/>
+    <rect x="32" y="32" width="10" height="58" fill="#FFFFFF" rx="4"/>
+    <rect x="22" y="44" width="20" height="10" fill="#FFFFFF"/>
+    <rect x="52" y="32" width="10" height="76" fill="#FFFFFF" rx="4"/>
+    <rect x="68" y="32" width="10" height="42" fill="#FFFFFF" rx="4"/>
+    <rect x="58" y="32" width="20" height="10" fill="#FFFFFF"/>
+    <rect x="58" y="64" width="20" height="10" fill="#FFFFFF"/>
+  </g>
+</svg>

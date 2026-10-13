@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#000000"/>
+  <rect width="198" height="198" x="1" y="1" rx="35" fill="none" stroke="#1E293B" stroke-width="2"/>
+  <g transform="translate(56, 32)" fill="#FFFFFF">
+      <!-- Leaf -->
+      <path d="M52 1 C52 12 43 23 32 23 C30 11 40 1 52 1 Z"/>
+      <!-- Body -->
+      <path d="M62 48 C62 34 72 28 73 27 C66 18 55 16 51 16 C41 15 31 22 26 22 C21 22 13 16 5 16 C-7 16 -18 27 -24 38 C-36 60 -27 92 -15 109 C-9 117 -2 126 6 126 C14 126 17 121 27 121 C36 121 40 126 47 126 C55 126 61 118 67 110 C74 99 77 89 77 88 C76 87 62 82 62 48 Z" transform="translate(24, 8)"/>
+    </g>
+    <text x="100" y="174" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="18" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">Apple Store</text>
+</svg>

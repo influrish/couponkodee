@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="fk-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="fk-yellow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffe11b"/>
+      <stop offset="100%" stop-color="#facc15"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#fk-bg)"/>
+  
+  <circle cx="500" cy="110" r="110" fill="#3b82f6" opacity="0.3"/>
+
+  <!-- Right Graphic: Flipkart bag / F icon -->
+  <g transform="translate(435, 45)">
+    <rect x="15" y="15" width="95" height="95" rx="16" fill="#ffe11b"/>
+    <text x="62" y="78" font-family="system-ui, sans-serif" font-size="64" font-weight="900" fill="#1e3a8a" text-anchor="middle">f</text>
+    <rect x="20" y="118" width="85" height="24" rx="6" fill="#dc2626"/>
+    <text x="62" y="134" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#FFFFFF" text-anchor="middle">PLUS MEMBER</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="180" height="26" rx="13" fill="#1d4ed8"/>
+    <circle cx="14" cy="13" r="4" fill="#ffe11b"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">BIG SAVING DAYS</text>
+    <text x="150" y="18" font-size="14">🇮🇳</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    BIG BILLION SAVINGS LIVE
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#93c5fd">
+    Top Mobiles, 4K Smart TVs, Laptops &amp; Home Appliances
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#fk-yellow)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#1e3a8a" text-anchor="middle" letter-spacing="0.5">
+      UP TO 60% OFF ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#fde047">
+    ⚡ Extra Axis Bank 10% Off &#8226; Free Express Delivery on Plus Orders
+  </text>
+</svg>
+

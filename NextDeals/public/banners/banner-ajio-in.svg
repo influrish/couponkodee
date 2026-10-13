@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ajio-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="ajio-ruby" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#ajio-bg)"/>
+  
+  <circle cx="500" cy="110" r="110" fill="#e11d48" opacity="0.15"/>
+
+  <!-- Right Graphic: AJIO logo text box -->
+  <g transform="translate(435, 55)">
+    <rect x="10" y="15" width="105" height="75" rx="12" fill="#FFFFFF"/>
+    <text x="62" y="58" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="2">AJIO</text>
+    <text x="62" y="75" font-family="system-ui, sans-serif" font-size="9" font-weight="800" fill="#64748b" text-anchor="middle" letter-spacing="2">TRENDS</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="180" height="26" rx="13" fill="#334155"/>
+    <circle cx="14" cy="13" r="4" fill="#e11d48"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">ALL STARS SALE LIVE</text>
+    <text x="150" y="18" font-size="14">🇮🇳</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    BIG BOLD FASHION SALE
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#94a3b8">
+    50% - 90% Off on 5,000+ Top International &amp; Indie Brands
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#ajio-ruby)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">
+      FLAT ₹500 OFF ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#fda4af">
+    ★ 100% Handpicked Fashion &#8226; Instant Code Verified &#8226; Hassle-Free Returns
+  </text>
+</svg>
+

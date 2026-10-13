@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+      <defs>
+        <linearGradient id="bg-ajio" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#090d16"/>
+          <stop offset="100%" stop-color="#1e293b"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#bg-ajio)"/>
+      <g transform="translate(100, 45)">
+        <rect x="0" y="0" width="200" height="50" rx="8" fill="#e2e8f0"/>
+        <text x="100" y="34" font-family="system-ui, sans-serif" font-weight="900" font-size="20" fill="#0f172a" text-anchor="middle" letter-spacing="3">BIG BOLD SALE</text>
+      </g>
+      <rect x="90" y="115" width="220" height="46" rx="23" fill="#e11d48"/>
+      <text x="200" y="145" font-family="system-ui, sans-serif" font-weight="900" font-size="20" fill="#FFFFFF" text-anchor="middle">50% - 80% OFF</text>
+      <text x="200" y="200" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#94a3b8" text-anchor="middle">Top International & Indian Fashion</text>
+    </svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="currys-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764"/>
+      <stop offset="50%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="currys-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#currys-bg)"/>
+  
+  <circle cx="510" cy="110" r="110" fill="#06b6d4" opacity="0.2"/>
+  
+  <!-- Right Graphic: Laptop / TV representation -->
+  <g transform="translate(425, 45)">
+    <rect x="15" y="10" width="110" height="75" rx="6" fill="#1e1b4b" stroke="#06b6d4" stroke-width="2.5"/>
+    <rect x="25" y="20" width="90" height="55" rx="2" fill="#0284c7" opacity="0.8"/>
+    <text x="70" y="52" font-family="system-ui, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" text-anchor="middle">4K OLED</text>
+    <polygon points="5,88 135,88 125,96 15,96" fill="#64748b"/>
+    <rect x="45" y="112" width="50" height="26" rx="13" fill="#ec4899"/>
+    <text x="70" y="129" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#FFFFFF" text-anchor="middle">CURRYS</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="185" height="26" rx="13" fill="#581c87"/>
+    <circle cx="14" cy="13" r="4" fill="#06b6d4"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#f8fafc" letter-spacing="0.5">PRICE MATCH PROMISE</text>
+    <text x="155" y="18" font-size="14">🇬🇧</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    EPIC TECH SAVINGS EVENT
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#c4b5fd">
+    Top Laptops, Gaming Consoles, Large Appliances &amp; Smart TVs
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="250" height="42" rx="10" fill="url(#currys-cyan)"/>
+    <text x="125" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="0.5">
+      SAVE £100 ON TECH
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#67e8f9">
+    ⚡ Order &amp; Collect in 1 Hour &#8226; Official UK Warranty Guaranteed
+  </text>
+</svg>
+

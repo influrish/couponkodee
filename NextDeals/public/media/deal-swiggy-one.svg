@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+      <defs>
+        <linearGradient id="bg-swiggy" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#7c2d12"/>
+          <stop offset="100%" stop-color="#FC8019"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#bg-swiggy)"/>
+      <ellipse cx="200" cy="150" rx="90" ry="30" fill="#451a03" opacity="0.4"/>
+      <path d="M140 140 C140 180, 260 180, 260 140 Z" fill="#FFFFFF"/>
+      <path d="M145 138 Q200 80 255 138 Z" fill="#f59e0b"/>
+      <rect x="135" y="135" width="130" height="12" rx="6" fill="#16a34a"/>
+      <path d="M185 75 Q180 60 185 45 M200 70 Q205 55 200 40 M215 75 Q210 60 215 45" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8"/>
+      <rect x="25" y="25" width="160" height="34" rx="17" fill="#FFFFFF"/>
+      <text x="105" y="48" font-family="system-ui, sans-serif" font-weight="900" font-size="13" fill="#FC8019" text-anchor="middle">FREE DELIVERY</text>
+      <text x="200" y="215" font-family="system-ui, sans-serif" font-weight="800" font-size="16" fill="#FFFFFF" text-anchor="middle">Swiggy One Special</text>
+    </svg>

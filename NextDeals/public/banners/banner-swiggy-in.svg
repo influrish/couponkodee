@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="swiggy-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c2d12"/>
+      <stop offset="50%" stop-color="#c2410c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="swiggy-white" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#fed7aa"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#swiggy-bg)"/>
+  
+  <circle cx="500" cy="110" r="110" fill="#fed7aa" opacity="0.2"/>
+
+  <!-- Right Graphic: Food plate / Swiggy 'S' -->
+  <g transform="translate(435, 45)">
+    <circle cx="60" cy="60" r="50" fill="#FFFFFF" opacity="0.95"/>
+    <text x="60" y="75" font-family="system-ui, sans-serif" font-size="52" font-weight="900" fill="#ea580c" text-anchor="middle">S</text>
+    <rect x="20" y="118" width="80" height="22" rx="4" fill="#18181b"/>
+    <text x="60" y="133" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#FFFFFF" text-anchor="middle">SWIGGY ONE</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="180" height="26" rx="13" fill="#9a3412"/>
+    <circle cx="14" cy="13" r="4" fill="#fde047"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">SUPER SAVER FOOD FEST</text>
+    <text x="150" y="18" font-size="14">🇮🇳</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    50% OFF FIRST 3 ORDERS
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#ffedd5">
+    Top Restaurants &amp; 10-Minute Instamart Grocery Essentials
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#swiggy-white)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#9a3412" text-anchor="middle" letter-spacing="0.5">
+      FLAT 50% OFF ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#ffedd5">
+    ★ Free Delivery on All Orders with Swiggy One &#8226; Exclusive Savings
+  </text>
+</svg>
+

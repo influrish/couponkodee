@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="dealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" rx="24" fill="url(#dealGrad)" />
+  <g opacity="0.08">
+    <circle cx="500" cy="100" r="150" fill="#FFFFFF" />
+    <circle cx="100" cy="350" r="100" fill="#FFFFFF" />
+  </g>
+
+  <!-- Top Merchant Bar -->
+  <rect x="30" y="30" width="140" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.2" />
+  <text x="100" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
+    APPLE
+  </text>
+
+  <!-- Discount Badge -->
+  <rect x="440" y="30" width="130" height="34" rx="17" fill="#38BDF8" />
+  <text x="505" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="middle">
+    $50 OFF
+  </text>
+
+  <!-- Center Deal Graphic Box -->
+  <g transform="translate(60, 95)">
+    <rect width="480" height="180" rx="20" fill="#FFFFFF" fill-opacity="0.1" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="1.5" />
+    <text x="240" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#93C5FD" text-anchor="middle" letter-spacing="2">
+      AUDIO DEAL
+    </text>
+    <text x="240" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" text-anchor="middle">
+      AirPods Pro 2 & MagSafe Accessories
+    </text>
+  </g>
+
+  <!-- Bottom CTA line -->
+  <text x="300" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="800" fill="#F8FAFC" text-anchor="middle">
+    Verified Price Drop &bull; Free Tracking Included
+  </text>
+</svg>

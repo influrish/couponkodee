@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bb-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002244"/>
+      <stop offset="50%" stop-color="#0046be"/>
+      <stop offset="100%" stop-color="#0a192f"/>
+    </linearGradient>
+    <linearGradient id="bb-tag" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffe11b"/>
+      <stop offset="100%" stop-color="#ffea3d"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#bb-bg)"/>
+  
+  <circle cx="500" cy="110" r="110" fill="#ffe11b" opacity="0.15"/>
+
+  <!-- Right Graphic: Best Buy Yellow Price Tag -->
+  <g transform="translate(435, 45)">
+    <polygon points="20,15 95,15 110,65 95,115 20,115" fill="#ffe11b"/>
+    <circle cx="35" cy="65" r="8" fill="#0046be"/>
+    <text x="70" y="58" font-family="system-ui, sans-serif" font-size="13" font-weight="900" fill="#002244" text-anchor="middle">BEST</text>
+    <text x="70" y="75" font-family="system-ui, sans-serif" font-size="13" font-weight="900" fill="#002244" text-anchor="middle">BUY</text>
+    <rect x="25" y="125" width="70" height="20" rx="4" fill="#FFFFFF"/>
+    <text x="60" y="139" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#0046be" text-anchor="middle">PRICE MATCH</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="180" height="26" rx="13" fill="#002244"/>
+    <circle cx="14" cy="13" r="4" fill="#ffe11b"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">TOP TECH EVENT</text>
+    <text x="150" y="18" font-size="14">🇺🇸</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    SAVE UP TO $150 ON TECH
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#93c5fd">
+    MacBooks, Gaming PCs, 4K OLED Screens &amp; Wireless Headphones
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#bb-tag)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#002244" text-anchor="middle" letter-spacing="0.5">
+      SAVE $150 ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#fde047">
+    ⚡ 1-Hour Store Pickup &#8226; Totaltech Member Protection Guarantee
+  </text>
+</svg>
+

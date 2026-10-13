@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#FFFFFF"/>
+  <rect width="198" height="198" x="1" y="1" rx="35" fill="none" stroke="#F1F5F9" stroke-width="2"/>
+  <g transform="translate(32, 42)">
+    <!-- Left loop -->
+    <path fill="#FF3F6C" d="M22 84c-12 0-22-10-22-22V32c0-12 10-22 22-22s22 10 22 22v30c0 12-10 22-22 22z"/>
+    <!-- Overlapping center-left orange -->
+    <path fill="#FF527B" opacity="0.9" d="M44 84c-12 0-22-10-22-22V32c0-12 10-22 22-22s22 10 22 22v30c0 12-10 22-22 22z"/>
+    <!-- Center right yellow-orange -->
+    <path fill="#FCA120" d="M92 84c-12 0-22-10-22-22V32c0-12 10-22 22-22s22 10 22 22v30c0 12-10 22-22 22z"/>
+    <!-- Far right orange-red -->
+    <path fill="#FC6020" opacity="0.9" d="M114 84c-12 0-22-10-22-22V32c0-12 10-22 22-22s22 10 22 22v30c0 12-10 22-22 22z"/>
+  </g>
+  <text x="100" y="165" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="20" fill="#282C3F" text-anchor="middle" letter-spacing="2">Myntra</text>
+</svg>

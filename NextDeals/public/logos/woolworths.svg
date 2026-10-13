@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#007A3D"/>
+  <rect width="198" height="198" x="1" y="1" rx="35" fill="none" stroke="#005A2B" stroke-width="2"/>
+  <g transform="translate(45, 30)">
+      <!-- Green Apple / Ribbon W -->
+      <circle cx="55" cy="50" r="42" fill="#FFFFFF"/>
+      <path d="M35 40 C35 55 42 68 55 68 C68 68 75 55 75 40 C75 55 68 65 55 65 C45 65 40 55 40 40 Z" fill="#007A3D"/>
+      <circle cx="55" cy="35" r="8" fill="#84CC16"/>
+    </g>
+    <text x="100" y="158" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="18" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">Woolworths</text>
+    <text x="100" y="178" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="11" fill="#A7F3D0" text-anchor="middle" letter-spacing="1">THE FRESH FOOD PEOPLE</text>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" rx="36" fill="#005DAA"/>
+  <rect width="198" height="198" x="1" y="1" rx="35" fill="none" stroke="#004580" stroke-width="2"/>
+  <g transform="translate(20, 45)">
+      <text x="80" y="48" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-style="italic" font-size="40" fill="#E31837" text-anchor="middle" letter-spacing="-1">COSTCO</text>
+      <!-- Wholesale speed lines -->
+      <rect x="25" y="60" width="110" height="4" fill="#005DAA"/>
+      <rect x="25" y="68" width="110" height="4" fill="#005DAA"/>
+      <rect x="25" y="76" width="110" height="4" fill="#005DAA"/>
+    </g>
+    <text x="100" y="165" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="16" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">WHOLESALE</text>
+</svg>

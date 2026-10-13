@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nike-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="50%" stop-color="#1f2937"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="nike-volt" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#bef264"/>
+      <stop offset="100%" stop-color="#a3e635"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#nike-bg)"/>
+  
+  <circle cx="500" cy="110" r="110" fill="#a3e635" opacity="0.12"/>
+
+  <!-- Right Graphic: Nike Swoosh shape -->
+  <g transform="translate(430, 60)">
+    <path d="M10,80 Q50,90 90,40 Q110,20 125,5 Q105,45 60,75 Q30,85 10,80 Z" fill="#a3e635"/>
+    <rect x="25" y="105" width="80" height="22" rx="4" fill="#374151"/>
+    <text x="65" y="120" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#a3e635" text-anchor="middle">JUST DO IT.</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="180" height="26" rx="13" fill="#374151"/>
+    <circle cx="14" cy="13" r="4" fill="#a3e635"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">MEMBER DAYS SALE</text>
+    <text x="150" y="18" font-size="14">🇺🇸</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    FLAT 20% OFF AIR &amp; SPORTSWEAR
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#9ca3af">
+    Verified Promo Code on Jordan, Dunks, Pegasus &amp; Tech Fleece
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#nike-volt)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#111827" text-anchor="middle" letter-spacing="0.5">
+      FLAT 20% OFF ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#bef264">
+    ★ Nike Member Free Shipping &#8226; 60-Day Return Guarantee
+  </text>
+</svg>
+

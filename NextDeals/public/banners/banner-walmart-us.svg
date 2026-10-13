@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wm-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#004c91"/>
+      <stop offset="50%" stop-color="#0071dc"/>
+      <stop offset="100%" stop-color="#091b36"/>
+    </linearGradient>
+    <linearGradient id="wm-yellow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffc220"/>
+      <stop offset="100%" stop-color="#ffe11b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="250" rx="16" fill="url(#wm-bg)"/>
+  
+  <circle cx="500" cy="110" r="110" fill="#ffc220" opacity="0.2"/>
+
+  <!-- Right Graphic: Walmart Spark icon representation -->
+  <g transform="translate(440, 50)">
+    <circle cx="50" cy="50" r="45" fill="#004c91" stroke="#ffc220" stroke-width="3"/>
+    <!-- 6 spark spokes -->
+    <line x1="50" y1="20" x2="50" y2="35" stroke="#ffc220" stroke-width="5" stroke-linecap="round"/>
+    <line x1="50" y1="65" x2="50" y2="80" stroke="#ffc220" stroke-width="5" stroke-linecap="round"/>
+    <line x1="24" y1="35" x2="37" y2="42" stroke="#ffc220" stroke-width="5" stroke-linecap="round"/>
+    <line x1="63" y1="58" x2="76" y2="65" stroke="#ffc220" stroke-width="5" stroke-linecap="round"/>
+    <line x1="24" y1="65" x2="37" y2="58" stroke="#ffc220" stroke-width="5" stroke-linecap="round"/>
+    <line x1="63" y1="42" x2="76" y2="35" stroke="#ffc220" stroke-width="5" stroke-linecap="round"/>
+    
+    <rect x="5" y="105" width="90" height="22" rx="4" fill="#ffc220"/>
+    <text x="50" y="120" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#004c91" text-anchor="middle">ROLLBACKS</text>
+  </g>
+
+  <!-- Top Badge -->
+  <g transform="translate(35, 28)">
+    <rect width="180" height="26" rx="13" fill="#004c91"/>
+    <circle cx="14" cy="13" r="4" fill="#ffc220"/>
+    <text x="26" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">OFFICIAL ROLLBACKS</text>
+    <text x="150" y="18" font-size="14">🇺🇸</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="35" y="96" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">
+    UP TO 50% OFF ROLLBACKS
+  </text>
+  <text x="35" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#93c5fd">
+    Tech, Patio, Grocery, Toys &amp; Home Essentials Price Drops
+  </text>
+
+  <!-- Value Pill Tag -->
+  <g transform="translate(35, 148)">
+    <rect width="260" height="42" rx="10" fill="url(#wm-yellow)"/>
+    <text x="130" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="900" fill="#004c91" text-anchor="middle" letter-spacing="0.5">
+      SAVE $50 ON ORDERS
+    </text>
+  </g>
+
+  <text x="35" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#fde047">
+    ★ Walmart+ Free Delivery &#8226; Verified Online Checkout Promo Code
+  </text>
+</svg>
+
