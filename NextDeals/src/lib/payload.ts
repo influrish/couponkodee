@@ -1,9 +1,6 @@
 import { getPayload, type Payload } from 'payload'
 import payloadConfig from '../payload.config'
 
-if (!process.env.PAYLOAD_SECRET) {
-  throw new Error('PAYLOAD_SECRET environment variable is missing')
-}
 
 declare global {
   var payload: {

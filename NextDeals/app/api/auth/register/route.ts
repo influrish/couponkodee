@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getPayloadClient } from "@/src/lib/payload"
+export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
   try {
