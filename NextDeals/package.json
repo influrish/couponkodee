@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--no-deprecation' next dev",
     "build": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=8000' next build",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview:worker": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:worker": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "start": "cross-env NODE_ENV=production next start",
     "lint": "next lint",
     "payload": "cross-env NODE_OPTIONS='--no-deprecation' payload dev",
@@ -47,6 +50,8 @@
     "tailwindcss-animate": "1.0.7"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.11",
+    "wrangler": "^4.151.0",
     "@eslint/eslintrc": "^3.3.7",
     "@playwright/test": "1.50.0",
     "@testing-library/react": "16.3.0",
