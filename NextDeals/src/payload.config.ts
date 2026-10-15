@@ -62,7 +62,11 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: mongooseAdapter({
-    url: process.env.MONGODB_URI || process.env.DATABASE_URI || '',
+    url: (process.env.MONGODB_URI || process.env.DATABASE_URI) || false,
+    connectOptions: {
+      serverSelectionTimeoutMS: 3000,
+      connectTimeoutMS: 3000,
+    },
   }),
   ...(sharp ? { sharp } : {}),
   plugins: [

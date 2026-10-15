@@ -18,6 +18,11 @@ if (!cached) {
 type InitOptions = Parameters<typeof getPayload>[0]
 
 export const getPayloadClient = async (initOptions?: Partial<InitOptions>): Promise<Payload> => {
+  const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URI
+  if (!mongoUri) {
+    throw new Error('MONGODB_URI is required to connect to database')
+  }
+
   if (!process.env.PAYLOAD_SECRET) {
     throw new Error('PAYLOAD_SECRET is required')
   }
