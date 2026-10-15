@@ -20,7 +20,8 @@ const nextConfig = {
   serverExternalPackages: [
     'express',
     '@swc/core',
-    'esbuild'
+    'esbuild',
+    'jose'
   ],
   outputFileTracingRoot: path.resolve(process.cwd()),
   experimental: {
