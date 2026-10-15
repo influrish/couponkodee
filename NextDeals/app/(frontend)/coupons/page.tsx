@@ -86,13 +86,17 @@ export default async function CouponsPage() {
   const allCoupons: CouponItem[] = []
 
   for (const c of dbCoupons) {
-    const key = `${(c.merchantSlug || c.merchant).toLowerCase()}::${(c.code || c.title).toLowerCase()}`
+    const merchantKey = String(c.merchantSlug || c.merchant || "").toLowerCase()
+    const codeKey = String(c.code || c.title || "").toLowerCase()
+    const key = `${merchantKey}::${codeKey}`
     seenCodes.add(key)
     allCoupons.push(c)
   }
 
   for (const c of staticCoupons) {
-    const key = `${(c.merchantSlug || c.merchant).toLowerCase()}::${(c.code || c.title).toLowerCase()}`
+    const merchantKey = String(c.merchantSlug || c.merchant || "").toLowerCase()
+    const codeKey = String(c.code || c.title || "").toLowerCase()
+    const key = `${merchantKey}::${codeKey}`
     if (!seenCodes.has(key)) {
       seenCodes.add(key)
       allCoupons.push(c)

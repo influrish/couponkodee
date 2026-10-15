@@ -87,13 +87,17 @@ export default async function DealsPage() {
   const allOffers: DealOfferItem[] = []
 
   for (const d of dbOffers) {
-    const key = `${(d.merchantSlug || d.merchant).toLowerCase()}::${d.title.toLowerCase()}`
+    const merchantKey = String(d.merchantSlug || d.merchant || "").toLowerCase()
+    const titleKey = String(d.title || "").toLowerCase()
+    const key = `${merchantKey}::${titleKey}`
     seenDeals.add(key)
     allOffers.push(d)
   }
 
   for (const d of staticOffers) {
-    const key = `${(d.merchantSlug || d.merchant).toLowerCase()}::${d.title.toLowerCase()}`
+    const merchantKey = String(d.merchantSlug || d.merchant || "").toLowerCase()
+    const titleKey = String(d.title || "").toLowerCase()
+    const key = `${merchantKey}::${titleKey}`
     if (!seenDeals.has(key)) {
       seenDeals.add(key)
       allOffers.push(d)
