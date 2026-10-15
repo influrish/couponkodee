@@ -4,7 +4,12 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
-import sharp from 'sharp'
+let sharp: any = undefined
+try {
+  sharp = (await import('sharp')).default
+} catch {
+  // Sharp native bindings are not supported in Cloudflare Workers runtime
+}
 
 // Use dynamic imports to avoid circular dependencies
 const Users = (await import('./collections/Users')).Users
@@ -59,7 +64,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.MONGODB_URI || process.env.DATABASE_URI || '',
   }),
-  sharp,
+  ...(sharp ? { sharp } : {}),
   plugins: [
     payloadCloudPlugin(),
   ],

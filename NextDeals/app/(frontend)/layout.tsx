@@ -18,18 +18,22 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   ])
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <CashbackProvider enabled={isCashbackEnabled}>
-        <CountryProvider>
-          <AuthProvider>
-            <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased font-sans overflow-x-clip w-full">
-              <Header initialData={headerData} isCashbackEnabled={isCashbackEnabled} />
-              <main className="flex-1 w-full overflow-x-clip">{children}</main>
-              <Footer initialData={footerData} isCashbackEnabled={isCashbackEnabled} />
-            </div>
-          </AuthProvider>
-        </CountryProvider>
-      </CashbackProvider>
-    </ThemeProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-slate-50 text-slate-800 antialiased font-sans">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <CashbackProvider enabled={isCashbackEnabled}>
+            <CountryProvider>
+              <AuthProvider>
+                <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased font-sans overflow-x-clip w-full">
+                  <Header initialData={headerData} isCashbackEnabled={isCashbackEnabled} />
+                  <main className="flex-1 w-full overflow-x-clip">{children}</main>
+                  <Footer initialData={footerData} isCashbackEnabled={isCashbackEnabled} />
+                </div>
+              </AuthProvider>
+            </CountryProvider>
+          </CashbackProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }
