@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--no-deprecation' next dev",
-    "build": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=8000' next build",
+    "build": "opennextjs-cloudflare build",
+    "build:next": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=8000' next build",
     "build:worker": "opennextjs-cloudflare build",
     "preview:worker": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:worker": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
