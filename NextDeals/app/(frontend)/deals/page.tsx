@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { getStoreOffers } from "@/lib/stores-data"
 import { getDbStores } from "@/lib/db-stores"
-import { getPayloadClient } from "@/src/lib/payload"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { DealsExplorer, DealOfferItem } from "@/components/deals-explorer"
@@ -57,6 +56,7 @@ export default async function DealsPage() {
   // 2. Fetch any database products/deals from Payload (if active)
   let dbOffers: DealOfferItem[] = []
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const productsResult = await payload.find({
       collection: "products",

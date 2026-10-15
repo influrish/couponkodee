@@ -1,4 +1,3 @@
-import { getPayloadClient } from "@/src/lib/payload"
 import { initialStores, getAllStores, StoreItem, StoreOffer, getStoreOffers, filterOffersByCashback, getStoreBySlug } from "@/lib/stores-data"
 import { getBrandLogo } from "@/lib/brand-logos"
 import { getStoreCountries } from "@/lib/countries-data"
@@ -35,6 +34,7 @@ export async function getDbStores(isCashbackEnabled?: boolean): Promise<StoreIte
   }
 
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const result = await payload.find({
       collection: "stores",
@@ -208,6 +208,7 @@ export async function getDbStoreBySlug(slug: string, isCashbackEnabled?: boolean
   }
 
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const storeResult = await payload.find({
       collection: "stores",
@@ -414,6 +415,7 @@ export async function getDbPopularStores(isCashbackEnabled?: boolean): Promise<A
 
   try {
     const allStores = await getDbStores(isCashbackEnabled)
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const result = await payload.find({
       collection: "stores",

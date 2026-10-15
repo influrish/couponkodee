@@ -1,4 +1,3 @@
-import { getPayloadClient } from "@/src/lib/payload"
 import {
   HeaderData,
   FooterData,
@@ -16,6 +15,7 @@ export { defaultHeaderData, defaultFooterData, defaultSiteSettingsData }
 
 export async function getHeaderData(): Promise<HeaderData> {
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const globalData = await payload.findGlobal({
       slug: "header",
@@ -73,6 +73,7 @@ export async function getHeaderData(): Promise<HeaderData> {
 
 export async function getFooterData(): Promise<FooterData> {
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const globalData = await payload.findGlobal({
       slug: "footer",
@@ -147,6 +148,7 @@ export async function getFooterData(): Promise<FooterData> {
 
 export async function getCashbackVisibility(): Promise<boolean> {
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const globalData = await payload.findGlobal({
       slug: "site-settings",
@@ -164,6 +166,7 @@ export async function getCashbackVisibility(): Promise<boolean> {
 
 export async function getSiteSettingsData(): Promise<SiteSettingsData> {
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const globalData = await payload.findGlobal({
       slug: "site-settings",
@@ -244,6 +247,7 @@ export async function getSiteSettingsData(): Promise<SiteSettingsData> {
 
 export async function getCmsPage(slug: string): Promise<PageData | null> {
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const result = await payload.find({
       collection: "pages",

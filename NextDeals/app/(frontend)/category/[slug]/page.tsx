@@ -12,7 +12,6 @@ import {
   StoreItem,
 } from "@/lib/stores-data"
 import { getDbStores } from "@/lib/db-stores"
-import { getPayloadClient } from "@/src/lib/payload"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import {
   ArrowRight,
@@ -100,6 +99,7 @@ export async function generateStaticParams() {
   const staticSlugs = Object.keys(CATEGORY_META)
 
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const categories = await payload.find({
       collection: "categories",
@@ -136,6 +136,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   }
 
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const categoryResult = await payload.find({
       collection: "categories",
@@ -179,6 +180,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   if (!categoryName) {
     try {
+      const { getPayloadClient } = await import("@/src/lib/payload")
       const payload = await getPayloadClient()
       const categoryResult = await payload.find({
         collection: "categories",

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getPayloadClient } from "@/src/lib/payload"
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
@@ -28,6 +27,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const normalizedEmail = email.toLowerCase().trim()
 

@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { getStoreOffers } from "@/lib/stores-data"
 import { getDbStores } from "@/lib/db-stores"
-import { getPayloadClient } from "@/src/lib/payload"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CouponsExplorer, CouponItem } from "@/components/coupons-explorer"
@@ -55,6 +54,7 @@ export default async function CouponsPage() {
   // 2. Fetch coupon offers from Payload CMS if active
   let dbCoupons: CouponItem[] = []
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const couponsResult = await payload.find({
       collection: "coupon-offers",

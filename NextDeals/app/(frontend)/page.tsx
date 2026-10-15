@@ -6,7 +6,6 @@ import { CouponCard } from "@/components/coupon-card"
 import { CashbackCard } from "@/components/cashback-card"
 import { DealCard } from "@/components/deal-card"
 import { StoreOfferCard } from "@/components/store-offer-card"
-import { getPayloadClient } from "@/src/lib/payload"
 import { getSiteSettingsData } from "@/lib/cms-settings"
 import { getAllStores, getStoreOffers } from "@/lib/stores-data"
 import { getDbStores, getDbPopularStores } from "@/lib/db-stores"
@@ -104,6 +103,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   let popularStoresList = await getDbPopularStores()
 
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
 
     const productFilter: any = searchTerm

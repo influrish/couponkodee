@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { getDbStores } from "@/lib/db-stores"
-import { getPayloadClient } from "@/src/lib/payload"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CashbackExplorer } from "@/components/cashback-explorer"
@@ -66,6 +65,7 @@ export default async function CashbackPage() {
   // Fetch Payload cashback offers if available
   let dbCashbackOffers: any[] = []
   try {
+    const { getPayloadClient } = await import("@/src/lib/payload")
     const payload = await getPayloadClient()
     const cashbacksResult = await payload.find({
       collection: "cashback-offers",

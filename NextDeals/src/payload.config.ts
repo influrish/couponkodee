@@ -28,15 +28,21 @@ const Header = (await import('./globals/Header')).Header
 const Footer = (await import('./globals/Footer')).Footer
 const SiteSettings = (await import('./globals/SiteSettings')).SiteSettings
 
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+let dirname = ''
+try {
+  if (typeof import.meta !== 'undefined' && typeof import.meta.url === 'string' && import.meta.url.startsWith('file:')) {
+    dirname = path.dirname(fileURLToPath(import.meta.url))
+  }
+} catch {
+  // Edge / Cloudflare Worker runtime
+}
 
 export default buildConfig({
   admin: {
     user: 'users',
     autoLogin: false,
     importMap: {
-      baseDir: path.resolve(dirname),
+      baseDir: dirname ? path.resolve(dirname) : process.cwd(),
     },
   },
   collections: [
@@ -59,7 +65,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
-    outputFile: path.resolve(dirname, 'payload-types.ts'),
+    outputFile: dirname ? path.resolve(dirname, 'payload-types.ts') : path.resolve(process.cwd(), 'src/payload-types.ts'),
   },
   db: mongooseAdapter({
     url: (process.env.MONGODB_URI || process.env.DATABASE_URI) || false,
