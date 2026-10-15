@@ -8,6 +8,7 @@ import { CouponsExplorer, CouponItem } from "@/components/coupons-explorer"
 import { getBrandLogo } from "@/lib/brand-logos"
 import { StoreLogoImage } from "@/components/store-logo-image"
 import {
+  BadgeCheck,
   ChevronRight,
   HelpCircle,
   Scissors,
