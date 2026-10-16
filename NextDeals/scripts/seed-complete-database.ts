@@ -86,6 +86,7 @@ async function seedCompleteDatabase() {
       isVerified: store.isVerified,
       isActive: true,
       sortOrder: store.isPopular ? 10 : 0,
+      customLogoUrl: store.logoUrl || null,
     }
 
     if (existing.docs.length > 0) {

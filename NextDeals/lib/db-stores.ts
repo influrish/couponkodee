@@ -120,8 +120,12 @@ export async function getDbStores(isCashbackEnabled?: boolean): Promise<StoreIte
         const storeSlug = String(doc.slug || "").toLowerCase().trim()
         const storeId = String(doc.id || doc._id || "")
         let logoUrl = ""
-        if (typeof doc.logo === "object" && doc.logo?.url) {
+        if (typeof doc.customLogoUrl === "string" && doc.customLogoUrl.trim()) {
+          logoUrl = doc.customLogoUrl.trim()
+        } else if (typeof doc.logo === "object" && doc.logo?.url) {
           logoUrl = doc.logo.url
+        } else if (typeof doc.logoUrl === "string" && doc.logoUrl.trim()) {
+          logoUrl = doc.logoUrl.trim()
         } else {
           logoUrl = getBrandLogo(storeSlug) || getBrandLogo(doc.name) || ""
         }
@@ -230,8 +234,12 @@ export async function getDbStoreBySlug(slug: string, isCashbackEnabled?: boolean
       const doc: any = storeResult.docs[0]
       const storeSlug = String(doc.slug || "").toLowerCase().trim()
       let logoUrl = ""
-      if (typeof doc.logo === "object" && doc.logo?.url) {
+      if (typeof doc.customLogoUrl === "string" && doc.customLogoUrl.trim()) {
+        logoUrl = doc.customLogoUrl.trim()
+      } else if (typeof doc.logo === "object" && doc.logo?.url) {
         logoUrl = doc.logo.url
+      } else if (typeof doc.logoUrl === "string" && doc.logoUrl.trim()) {
+        logoUrl = doc.logoUrl.trim()
       } else {
         logoUrl = getBrandLogo(storeSlug) || getBrandLogo(doc.name) || ""
       }

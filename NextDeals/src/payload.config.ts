@@ -1,6 +1,11 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  lexicalEditor,
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
+} from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -62,7 +67,16 @@ export default buildConfig({
     Footer,
     SiteSettings,
   ],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      FixedToolbarFeature(),
+      InlineToolbarFeature(),
+      HeadingFeature({
+        enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+      }),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: dirname ? path.resolve(dirname, 'payload-types.ts') : path.resolve(process.cwd(), 'src/payload-types.ts'),

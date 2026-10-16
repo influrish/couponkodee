@@ -120,6 +120,7 @@ export const initialStores: StoreItem[] = [
     affiliateUrl: "https://www.ajio.com/",
     bg: "bg-slate-900",
     description: "Trendy fashion and lifestyle store by Reliance with handpicked designer styles.",
+    logoUrl: "/logos/ajio.jpg",
     offers: [
       { id: "ajio-1", title: "Extra 25% Off on Men & Women Footwear", description: "Valid on sneakers, sports shoes and formal footwear.", code: "AJIOSTEP25", discount: "25% OFF", type: "coupon", affiliateUrl: "https://www.ajio.com/", isVerified: true },
       { id: "ajio-2", title: "Flat 50-80% Off in Big Bold Sale", description: "Massive savings on top international and Indian fashion labels.", discount: "50-80% OFF", type: "deal", affiliateUrl: "https://www.ajio.com/", isVerified: true },
@@ -205,6 +206,7 @@ export const initialStores: StoreItem[] = [
     affiliateUrl: "https://www.croma.com/",
     bg: "bg-teal-700",
     description: "Tata's premium electronics retail store for gadgets and home appliances.",
+    logoUrl: "/logos/croma.jpg",
   },
   {
     id: "cleartrip",
@@ -243,6 +245,7 @@ export const initialStores: StoreItem[] = [
     affiliateUrl: "https://www.dominos.co.in/",
     bg: "bg-blue-600",
     description: "Hot pizza, cheesy garlic bread, choco lava cakes delivered in under 30 minutes.",
+    logoUrl: "/logos/dominos.jpg",
     offers: [
       { id: "dom-1", title: "Flat ₹120 Off on Regular & Medium Pizzas", description: "Valid on pizzas of minimum value ₹350.", code: "DOM120", discount: "₹120 OFF", type: "coupon", affiliateUrl: "https://www.dominos.co.in/", isVerified: true },
       { id: "dom-2", title: "Buy 1 Get 1 Free on Every Friday", description: "Order any medium pizza and get another free.", discount: "BOGO FREE", type: "deal", affiliateUrl: "https://www.dominos.co.in/", isVerified: true },
@@ -426,6 +429,7 @@ export const initialStores: StoreItem[] = [
     affiliateUrl: "https://www.lenskart.com/",
     bg: "bg-indigo-700",
     description: "Eyewear brand for prescription eyeglasses, computer glasses, and sunglasses.",
+    logoUrl: "/logos/lenskart.jpg",
   },
 
   // M
@@ -493,6 +497,7 @@ export const initialStores: StoreItem[] = [
     affiliateUrl: "https://www.nykaa.com/",
     bg: "bg-pink-500",
     description: "Premier beauty and cosmetics destination with 100% genuine luxury products.",
+    logoUrl: "/logos/nykaa.jpg",
     offers: [
       { id: "nykaa-1", title: "Flat 15% Off on Skincare & Makeup Over ₹499", description: "Valid on verified luxury beauty labels with free delivery.", code: "NYKAAGLOW", discount: "15% OFF", type: "coupon", affiliateUrl: "https://www.nykaa.com/", isVerified: true },
       { id: "nykaa-2", title: "Up to 40% Off on Fragrances & Perfumes", description: "Exclusive discounts on designer eau de parfums and colognes.", discount: "40% OFF", type: "deal", affiliateUrl: "https://www.nykaa.com/", isVerified: true },

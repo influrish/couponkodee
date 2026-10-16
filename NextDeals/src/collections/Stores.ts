@@ -78,7 +78,14 @@ export const Stores: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       admin: {
-        description: "Store logo image (optional, falls back to letter icon)",
+        description: "Upload store logo image file directly (saved permanently to media library)",
+      },
+    },
+    {
+      name: "customLogoUrl",
+      type: "text",
+      admin: {
+        description: "Direct store logo URL or relative path (e.g. /logos/lenskart.jpg, /logos/ajio.jpg, or external https://...). Overrides default icon across mobile & desktop.",
       },
     },
     {

@@ -231,8 +231,16 @@ const SLUG_ALIASES: Record<string, string> = {
   "2gud": "2gud",
 }
 
+const CUSTOM_BRAND_LOGOS: Record<string, string> = {
+  lenskart: "/logos/lenskart.jpg",
+  ajio: "/logos/ajio.jpg",
+  nykaa: "/logos/nykaa.jpg",
+  dominos: "/logos/dominos.jpg",
+  croma: "/logos/croma.jpg",
+}
+
 /**
- * Returns the public URL of the SVG brand logo for any merchant/store identifier.
+ * Returns the public URL of the brand logo for any merchant/store identifier.
  */
 export function getBrandLogo(identifier?: string | null): string | null {
   if (!identifier) return null
@@ -250,6 +258,10 @@ export function getBrandLogo(identifier?: string | null): string | null {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "")
 
+  if (CUSTOM_BRAND_LOGOS[normalized]) {
+    return CUSTOM_BRAND_LOGOS[normalized]
+  }
+
   if (KNOWN_LOGOS.has(normalized)) {
     return `/logos/${normalized}.svg`
   }
@@ -260,6 +272,10 @@ export function getBrandLogo(identifier?: string | null): string | null {
 
   // 2. Alphanumeric only key
   const alphaNumeric = identifier.toLowerCase().replace(/[^a-z0-9]/g, "")
+  if (CUSTOM_BRAND_LOGOS[alphaNumeric]) {
+    return CUSTOM_BRAND_LOGOS[alphaNumeric]
+  }
+
   if (KNOWN_LOGOS.has(alphaNumeric)) {
     return `/logos/${alphaNumeric}.svg`
   }
