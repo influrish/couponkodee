@@ -72,6 +72,7 @@ export default buildConfig({
     connectOptions: {
       serverSelectionTimeoutMS: 3000,
       connectTimeoutMS: 3000,
+      bufferCommands: false,
     },
   }),
   ...(sharp ? { sharp } : {}),

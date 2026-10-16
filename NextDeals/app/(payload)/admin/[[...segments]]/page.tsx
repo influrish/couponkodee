@@ -19,9 +19,40 @@ type Args = {
   }>
 }
 
-export const generateMetadata = ({ params, searchParams }: Args): Promise<Metadata> =>
-  generatePageMetadata({ config, params, searchParams })
+export const generateMetadata = async ({ params, searchParams }: Args): Promise<Metadata> => {
+  const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URI || ''
+  const isInvalidMongo =
+    !mongoUri ||
+    mongoUri.includes('127.0.0.1') ||
+    mongoUri.includes('localhost') ||
+    mongoUri.includes('<username>') ||
+    mongoUri.includes('...')
 
-const Page = ({ params, searchParams }: Args) => RootPage({ config, importMap, params, searchParams })
+  if (isInvalidMongo) {
+    return { title: 'Admin Setup Required | CouponKodee' }
+  }
+
+  try {
+    return await generatePageMetadata({ config, params, searchParams })
+  } catch {
+    return { title: 'Admin Portal | CouponKodee' }
+  }
+}
+
+const Page = async ({ params, searchParams }: Args) => {
+  const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URI || ''
+  const isInvalidMongo =
+    !mongoUri ||
+    mongoUri.includes('127.0.0.1') ||
+    mongoUri.includes('localhost') ||
+    mongoUri.includes('<username>') ||
+    mongoUri.includes('...')
+
+  if (isInvalidMongo) {
+    return null
+  }
+
+  return RootPage({ config, importMap, params, searchParams })
+}
 
 export default Page
