@@ -133,7 +133,11 @@ Conventions:
 - The storefront is light-only (`forcedTheme="light"`). Dark mode would need dark variants throughout the components first.
 - `cn()` (`lib/utils.ts`) knows the custom `text-2xs` / `text-md` sizes. Register any new size token there too.
 
-## Production (Cloudflare Workers)
+## Production
+
+**Deploy on a Node host, not Cloudflare Workers.** See [DEPLOY.md](DEPLOY.md). Payload with MongoDB fails on Workers after the first request (shared database connections aren't allowed across requests). Cloudflare is still used for DNS and caching.
+
+### Legacy: Cloudflare Workers (not supported for the admin)
 
 Pushing to `main` on `influrish/couponkodee` triggers the Cloudflare build (`pnpm deploy` runs `opennextjs-cloudflare build && deploy`). Required secrets: `MONGODB_URI` (Atlas, with the IP access list allowing Cloudflare egress) and `PAYLOAD_SECRET`. Set `NEXT_PUBLIC_SITE_URL` as a plain variable.
 
