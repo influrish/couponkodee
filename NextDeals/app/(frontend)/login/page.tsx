@@ -1,9 +1,13 @@
 "use client"
 
-import { useState, Suspense } from "react"
-import Link from "next/link"
+import { useState, useEffect, Suspense } from "react"
+import Link from "@/components/localized-link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
+import { BrandLogo } from "@/components/brand-logo"
+import { safeRedirectPath } from "@/lib/safe-redirect"
+import { localizeHref } from "@/lib/regions"
+import { useCountry } from "@/components/country-context"
 import { useCashbackVisibility } from "@/components/cashback-context"
 import {
   ArrowRight,
@@ -24,7 +28,8 @@ import {
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectUrl = searchParams.get("redirect") || "/"
+  const { region } = useCountry()
+  const redirectUrl = localizeHref(safeRedirectPath(searchParams.get("redirect")), region)
   const isCashbackEnabled = useCashbackVisibility()
 
   const { login, user } = useAuth()
@@ -35,9 +40,12 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // If already logged in, redirect
-  if (user) {
-    router.replace(redirectUrl)
+  // If already logged in, redirect (in an effect: navigating during render is not allowed)
+  useEffect(() => {
+    if (user && !isSubmitting) router.replace(redirectUrl)
+  }, [user, isSubmitting, redirectUrl, router])
+
+  if (user && !isSubmitting) {
     return null
   }
 
@@ -61,12 +69,6 @@ function LoginForm() {
     }
   }
 
-  const fillDemoAdmin = () => {
-    setEmail("admin@couponkodee.com")
-    setPassword("admin123")
-    setError(null)
-  }
-
   return (
     <div className="min-h-[85vh] py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="w-full max-w-4xl bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12">
@@ -77,21 +79,14 @@ function LoginForm() {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10">
-            <Link href="/" className="inline-flex items-center gap-2 mb-8 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 font-black text-white text-lg shadow-md group-hover:scale-105 transition-transform">
-                CK
-              </div>
-              <span className="text-xl font-black tracking-tight text-white">
-                Coupon<span className="text-purple-400">Kodee</span>
-              </span>
-            </Link>
+            <BrandLogo tone="light" size="lg" className="mb-8" />
 
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-800/60 border border-purple-600/40 text-purple-200 text-xs font-bold mb-4">
               <Sparkles className="h-3.5 w-3.5 text-purple-300" />
               Member Benefits
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+            <h2 className="text-3xl font-black text-white tracking-tight leading-tight">
               Save more on every single purchase.
             </h2>
 
@@ -147,7 +142,7 @@ function LoginForm() {
         <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-center">
           <div className="max-w-md mx-auto w-full">
             <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">
                 Welcome back
               </h1>
               <p className="mt-1 text-sm text-slate-600">
@@ -169,7 +164,7 @@ function LoginForm() {
                   Email Address
                 </label>
                 <div className="relative flex items-center">
-                  <Mail className="absolute left-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <Mail className="absolute left-3.5 h-4 w-4 text-slate-500 pointer-events-none" />
                   <input
                     type="email"
                     required
@@ -195,7 +190,7 @@ function LoginForm() {
                   </button>
                 </div>
                 <div className="relative flex items-center">
-                  <Lock className="absolute left-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <Lock className="absolute left-3.5 h-4 w-4 text-slate-500 pointer-events-none" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -207,7 +202,7 @@ function LoginForm() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute right-3 p-1 text-slate-500 hover:text-slate-600 transition-colors"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -241,18 +236,6 @@ function LoginForm() {
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Fill */}
-            <div className="mt-4 pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={fillDemoAdmin}
-                className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-purple-50 text-slate-700 hover:text-purple-800 text-xs font-bold border border-slate-200 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Zap className="h-3.5 w-3.5 text-amber-500" />
-                <span>Auto-fill Demo Credentials (admin@couponkodee.com)</span>
-              </button>
-            </div>
 
             {/* Switch to Sign Up */}
             <div className="mt-6 pt-5 border-t border-slate-200 text-center">

@@ -1,3 +1,5 @@
+> **Note:** For local setup and the current environment variables, see [README.md](README.md). This guide is general background on running MongoDB at scale; its examples use the older `dealscope` database name.
+
 # 🚀 MongoDB High Traffic Setup Guide
 
 ## Why MongoDB for High Traffic?

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo, useRef } from "react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { useCountry } from "@/components/country-context"
 import { CountryFlag } from "@/components/country-flag"
 import { getBrandLogo } from "@/lib/brand-logos"
@@ -16,7 +16,7 @@ export interface BannerSlide {
   id: string
   storeName: string
   storeSlug: string
-  storeLogo?: string
+  storeLogo?: string | null
   bannerImage: string
   countryCode: string
   verifiedBadge: string
@@ -475,9 +475,11 @@ export function HeroSlidingBanners({
     })
   }, [country, customBanners])
 
-  // Reset slide index when country changes
+  // Reset slide index and image-error state when country changes:
+  // slide ids are index-based, so old failures would hide the new country's banners
   useEffect(() => {
     setCurrentSlide(0)
+    setFailedBanners({})
   }, [country.code])
 
   // Auto-slide effect (configurable from admin, default 4500ms)
@@ -522,14 +524,14 @@ export function HeroSlidingBanners({
 
   return (
     <div
-      className="rounded-2xl sm:rounded-3xl bg-slate-900 border border-slate-200/90 shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group select-none"
+      className="relative select-none group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Slide track */}
-      <div className="overflow-hidden relative w-full hero-banner-track">
+      {/* Slide track: artwork is 2.4:1, matching the track, so it fills edge to edge */}
+      <div className="overflow-hidden relative w-full hero-banner-track rounded-2xl sm:rounded-3xl bg-slate-900 border border-slate-200/90 shadow-xl hover:shadow-2xl transition-shadow">
         <div
           className="flex h-full transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -556,7 +558,7 @@ export function HeroSlidingBanners({
                         )}
                         <div>
                           <span className="text-xs font-bold text-indigo-300 uppercase tracking-widest block">OFFICIAL PARTNER</span>
-                          <h3 className="text-base sm:text-xl font-black">{slide.storeName}</h3>
+                          <h3 className="text-base sm:text-xl font-extrabold">{slide.storeName}</h3>
                         </div>
                       </div>
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">
@@ -564,7 +566,7 @@ export function HeroSlidingBanners({
                       </span>
                     </div>
                     <div className="my-2">
-                      <h2 className="text-xl sm:text-2xl font-black text-white">
+                      <h2 className="text-2xl font-extrabold text-white">
                         {!isCashbackEnabled
                           ? slide.title
                               .replace(/\s*\+\s*Extra\s*[^+]*(?:Bank\s*)?Cashback/gi, " + Verified Savings")
@@ -579,7 +581,7 @@ export function HeroSlidingBanners({
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/20 font-mono text-xs sm:text-sm font-black text-cyan-400">
+                      <span className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/20 font-mono text-xs sm:text-sm font-bold text-cyan-400">
                         {slide.promoCode}
                       </span>
                       <span className="px-3 py-1.5 rounded-xl bg-purple-700 text-white font-bold text-xs sm:text-sm">
@@ -592,7 +594,7 @@ export function HeroSlidingBanners({
                   <img
                     src={slide.bannerImage}
                     alt={`${slide.storeName} Official Offer Banner`}
-                    className="w-full h-full object-contain sm:object-cover object-center transition-transform duration-500 group-hover/slide:scale-[1.02]"
+                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover/slide:scale-[1.02]"
                     loading={index === 0 ? "eager" : "lazy"}
                     onError={() => setFailedBanners((prev) => ({ ...prev, [slide.id]: true }))}
                   />
@@ -600,7 +602,7 @@ export function HeroSlidingBanners({
 
                 {/* Official Offer Pill Tag */}
                 {showOfficialBadge && (
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-[10px] sm:text-xs font-extrabold text-white border border-white/20 shadow-md pointer-events-none">
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-2xs sm:text-xs font-bold text-white border border-white/20 shadow-md pointer-events-none">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Official Ongoing Offer</span>
                   </div>
@@ -637,29 +639,30 @@ export function HeroSlidingBanners({
         >
           <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
+      </div>
 
-        {/* Floating Bottom Navigation Dots & Indicators */}
-        <div className="absolute bottom-2 sm:bottom-3 left-0 right-0 flex items-center justify-center gap-2 z-20 pointer-events-none">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/15 pointer-events-auto shadow-sm">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setCurrentSlide(idx)
-                }}
-                className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  currentSlide === idx
-                    ? "w-5 sm:w-6 bg-white shadow-xs"
-                    : "w-1.5 sm:w-2 bg-white/50 hover:bg-white/80"
-                }`}
-                aria-label={`Go to banner slide ${idx + 1}`}
-              />
-            ))}
-          </div>
-        </div>
+      {/* Slide indicators sit below the card, on the page background, so they never cover banner text */}
+      <div className="mt-2 flex items-center justify-center">
+        {slides.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setCurrentSlide(idx)
+            }}
+            className="group/dot inline-flex items-center justify-center p-1.5"
+            aria-label={`Go to banner slide ${idx + 1}`}
+            aria-current={currentSlide === idx ? "true" : undefined}
+          >
+            <span
+              className={`block h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                currentSlide === idx ? "w-5 sm:w-6 bg-purple-600" : "w-1.5 sm:w-2 bg-slate-300 group-hover/dot:bg-slate-400"
+              }`}
+            />
+          </button>
+        ))}
       </div>
     </div>
   )

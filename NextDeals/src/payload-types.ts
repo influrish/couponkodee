@@ -73,8 +73,10 @@ export interface Config {
     products: Product;
     'cashback-offers': CashbackOffer;
     categories: Category;
+    pages: Page;
     media: Media;
     'newsletter-subscribers': NewsletterSubscriber;
+    'contact-messages': ContactMessage;
     'price-history': PriceHistory;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,8 +90,10 @@ export interface Config {
     products: ProductsSelect<false> | ProductsSelect<true>;
     'cashback-offers': CashbackOffersSelect<false> | CashbackOffersSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'newsletter-subscribers': NewsletterSubscribersSelect<false> | NewsletterSubscribersSelect<true>;
+    'contact-messages': ContactMessagesSelect<false> | ContactMessagesSelect<true>;
     'price-history': PriceHistorySelect<false> | PriceHistorySelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -98,8 +102,16 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    header: Header;
+    footer: Footer;
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -184,32 +196,17 @@ export interface Store {
    */
   initial?: string | null;
   /**
-   * Store logo image (optional, falls back to letter icon)
+   * Upload store logo image file directly (saved permanently to media library)
    */
   logo?: (string | null) | Media;
   /**
-   * Store avatar background color theme
+   * Direct store logo URL or relative path (e.g. /logos/lenskart.jpg, /logos/ajio.jpg, or external https://...). Overrides default icon across mobile & desktop.
    */
-  bg?:
-    | (
-        | 'bg-slate-900'
-        | 'bg-slate-800'
-        | 'bg-amber-500'
-        | 'bg-amber-600'
-        | 'bg-blue-500'
-        | 'bg-blue-600'
-        | 'bg-rose-500'
-        | 'bg-pink-500'
-        | 'bg-orange-500'
-        | 'bg-red-500'
-        | 'bg-red-600'
-        | 'bg-indigo-600'
-        | 'bg-emerald-600'
-        | 'bg-cyan-600'
-        | 'bg-teal-600'
-        | 'bg-purple-700'
-      )
-    | null;
+  customLogoUrl?: string | null;
+  /**
+   * Store avatar background color class (e.g. bg-amber-500, bg-blue-600, bg-rose-500)
+   */
+  bg?: string | null;
   /**
    * Base affiliate tracking URL for redirection (e.g. https://www.amazon.in/?tag=youraffid)
    */
@@ -428,7 +425,7 @@ export interface Product {
   images?:
     | {
         image: string | Media;
-        alt: string;
+        alt?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -436,20 +433,10 @@ export interface Product {
    * Affiliate link to the product
    */
   affiliateUrl: string;
-  merchant:
-    | 'amazon'
-    | 'flipkart'
-    | 'myntra'
-    | 'ajio'
-    | 'nykaa'
-    | 'swiggy'
-    | 'makemytrip'
-    | 'samsung'
-    | 'ebay'
-    | 'bestbuy'
-    | 'target'
-    | 'walmart'
-    | 'other';
+  /**
+   * Store name / slug (e.g. amazon, flipkart, myntra, tata-1mg, etc.)
+   */
+  merchant: string;
   features?:
     | {
         name: string;
@@ -637,6 +624,40 @@ export interface CashbackOffer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  /**
+   * Page heading (e.g. 'About Us', 'Privacy Policy')
+   */
+  title: string;
+  /**
+   * URL path slug (e.g. 'about', 'privacy', 'terms', 'contact')
+   */
+  slug: string;
+  /**
+   * Optional brief subtitle under page title
+   */
+  subtitle?: string | null;
+  /**
+   * Full body content of this page. Supports text, markdown, or HTML.
+   */
+  body: string;
+  isPublished?: boolean | null;
+  /**
+   * SEO Meta Title
+   */
+  metaTitle?: string | null;
+  /**
+   * SEO Meta Description
+   */
+  metaDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "newsletter-subscribers".
  */
 export interface NewsletterSubscriber {
@@ -653,6 +674,22 @@ export interface NewsletterSubscriber {
     frequency?: ('daily' | 'weekly' | 'monthly') | null;
   };
   source?: ('website' | 'social' | 'referral' | 'ad') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Messages sent from the website contact form.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-messages".
+ */
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status?: ('new' | 'in-progress' | 'resolved') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -708,12 +745,20 @@ export interface PayloadLockedDocument {
         value: string | Category;
       } | null)
     | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
         relationTo: 'media';
         value: string | Media;
       } | null)
     | ({
         relationTo: 'newsletter-subscribers';
         value: string | NewsletterSubscriber;
+      } | null)
+    | ({
+        relationTo: 'contact-messages';
+        value: string | ContactMessage;
       } | null)
     | ({
         relationTo: 'price-history';
@@ -797,6 +842,7 @@ export interface StoresSelect<T extends boolean = true> {
   description?: T;
   initial?: T;
   logo?: T;
+  customLogoUrl?: T;
   bg?: T;
   affiliateUrl?: T;
   cashbackRate?: T;
@@ -954,6 +1000,21 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  subtitle?: T;
+  body?: T;
+  isPublished?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -1026,6 +1087,19 @@ export interface NewsletterSubscribersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-messages_select".
+ */
+export interface ContactMessagesSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  subject?: T;
+  message?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "price-history_select".
  */
 export interface PriceHistorySelect<T extends boolean = true> {
@@ -1068,6 +1142,495 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: string;
+  brand: {
+    /**
+     * First part of the logo text (e.g. 'Coupon')
+     */
+    brandName: string;
+    /**
+     * Highlighted part of the logo text (e.g. 'Kodee')
+     */
+    brandHighlight: string;
+    /**
+     * Optional URL for custom image logo (overrides text logo if provided)
+     */
+    customLogoUrl?: string | null;
+  };
+  appearance?: {
+    navbarBg?: ('white' | 'slate' | 'dark' | 'transparent' | 'custom') | null;
+    /**
+     * Used when 'Custom Hex Color' is selected above
+     */
+    customBgColor?: string | null;
+    accentColor?: ('purple' | 'emerald' | 'indigo' | 'orange' | 'blue' | 'custom') | null;
+    /**
+     * Used when 'Custom Hex Color' is selected above
+     */
+    customAccentColor?: string | null;
+    announcementBg?: ('purple-gradient' | 'emerald' | 'amber' | 'dark' | 'custom') | null;
+    customAnnouncementBg?: string | null;
+    customAnnouncementTextColor?: string | null;
+  };
+  announcement?: {
+    enabled?: boolean | null;
+    /**
+     * Notice message displayed in the top banner
+     */
+    text?: string | null;
+    /**
+     * Optional destination link for the announcement
+     */
+    link?: string | null;
+    badge?: string | null;
+  };
+  search?: {
+    /**
+     * Input placeholder text inside the header search bar
+     */
+    placeholder?: string | null;
+    buttonText?: string | null;
+  };
+  menuItems?:
+    | {
+        /**
+         * Visible menu title (e.g. 'Stores', 'Coupons')
+         */
+        label: string;
+        /**
+         * Destination URL (e.g. '/stores', '/deals')
+         */
+        url: string;
+        /**
+         * Optional badge label (e.g. 'Hot', 'Extra Cash', 'New')
+         */
+        badge?: string | null;
+        isCashback?: boolean | null;
+        openInNewTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  features?: {
+    showCountrySelector?: boolean | null;
+    showSearch?: boolean | null;
+    loginLabel?: string | null;
+    signupLabel?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: string;
+  brand: {
+    /**
+     * Title above brand description (e.g. 'About CouponKodee')
+     */
+    aboutTitle?: string | null;
+    brandName: string;
+    brandHighlight: string;
+    tagline?: string | null;
+    /**
+     * Optional URL for custom image logo (overrides text logo if provided)
+     */
+    customLogoUrl?: string | null;
+    bio: string;
+  };
+  appearance?: {
+    themePreset?: ('white' | 'cream' | 'slate' | 'dark' | 'custom') | null;
+    /**
+     * Used when 'Custom Hex Color' is selected above
+     */
+    customBgColor?: string | null;
+    /**
+     * Optional custom text color for footer copy
+     */
+    customTextColor?: string | null;
+    accentColor?: ('purple' | 'emerald' | 'indigo' | 'orange' | 'blue' | 'custom') | null;
+    /**
+     * Used when 'Custom Hex Color' is selected above
+     */
+    customAccentColor?: string | null;
+    socialIconStyle?: ('colored-circle' | 'monochrome-dark' | 'rounded-square' | 'outline') | null;
+    layoutColumns?: ('5-cols' | '4-cols' | '3-cols') | null;
+    showSocialLinks?: boolean | null;
+    showCopyrightBar?: boolean | null;
+  };
+  socialLinks?: {
+    facebook?: string | null;
+    twitter?: string | null;
+    pinterest?: string | null;
+    whatsapp?: string | null;
+    instagram?: string | null;
+    youtube?: string | null;
+    telegram?: string | null;
+    linkedin?: string | null;
+  };
+  columns?:
+    | {
+        /**
+         * Column heading (e.g. 'Popular Stores')
+         */
+        title: string;
+        links?:
+          | {
+              label: string;
+              url: string;
+              isHighlighted?: boolean | null;
+              openInNewTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  disclosure?: {
+    showDisclosure?: boolean | null;
+    title?: string | null;
+    content?: string | null;
+  };
+  copyright?: {
+    /**
+     * Use '{year}' to automatically insert current year
+     */
+    text?: string | null;
+    bottomLinks?:
+      | {
+          label: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: string;
+  /**
+   * Controls whether cashback functionality, sections, rates, badges, tabs, and routes are shown or completely hidden on the public website. Default is OFF.
+   */
+  cashbackVisibility: 'off' | 'on';
+  appearance?: {
+    primaryAccent?: ('purple' | 'indigo' | 'emerald' | 'orange' | 'blue') | null;
+    heroBackgroundStyle?: ('radial-glow' | 'clean-white' | 'soft-slate') | null;
+  };
+  hero: {
+    /**
+     * Super-badge text above the main headline
+     */
+    kicker?: string | null;
+    /**
+     * Main big headline on the homepage
+     */
+    title: string;
+    subtitle: string;
+    badgeText?: string | null;
+    cashbackPillLabel?: string | null;
+    /**
+     * Slide display duration in ms (e.g. 4500 for 4.5 seconds, 3000 for 3 seconds)
+     */
+    autoSlideInterval?: number | null;
+    showOfficialBadge?: boolean | null;
+    bannerHoverPause?: boolean | null;
+    /**
+     * Add custom sliding banners. If left empty, banners automatically adapt to the user's selected country.
+     */
+    banners?:
+      | {
+          storeName: string;
+          title: string;
+          subtitle?: string | null;
+          code: string;
+          cashbackRate?: string | null;
+          storeRating?: string | null;
+          successRate?: string | null;
+          /**
+           * Optional country code (e.g. IN, UK, US). Leave blank for all countries.
+           */
+          countryCode?: string | null;
+          /**
+           * Optional URL/path to official promotional banner image (e.g. /banners/banner-amazon-uk.svg)
+           */
+          bannerImage?: string | null;
+          linkUrl?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  howItWorks?: {
+    kicker?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+    steps?:
+      | {
+          stepNumber: string;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  faqs?: {
+    title?: string | null;
+    subtitle?: string | null;
+    items?:
+      | {
+          q: string;
+          a: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  newsletter?: {
+    heading?: string | null;
+    subtitle?: string | null;
+    buttonText?: string | null;
+  };
+  contact?: {
+    supportEmail?: string | null;
+    partnershipsEmail?: string | null;
+    supportPhone?: string | null;
+    address?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  brand?:
+    | T
+    | {
+        brandName?: T;
+        brandHighlight?: T;
+        customLogoUrl?: T;
+      };
+  appearance?:
+    | T
+    | {
+        navbarBg?: T;
+        customBgColor?: T;
+        accentColor?: T;
+        customAccentColor?: T;
+        announcementBg?: T;
+        customAnnouncementBg?: T;
+        customAnnouncementTextColor?: T;
+      };
+  announcement?:
+    | T
+    | {
+        enabled?: T;
+        text?: T;
+        link?: T;
+        badge?: T;
+      };
+  search?:
+    | T
+    | {
+        placeholder?: T;
+        buttonText?: T;
+      };
+  menuItems?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        badge?: T;
+        isCashback?: T;
+        openInNewTab?: T;
+        id?: T;
+      };
+  features?:
+    | T
+    | {
+        showCountrySelector?: T;
+        showSearch?: T;
+        loginLabel?: T;
+        signupLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  brand?:
+    | T
+    | {
+        aboutTitle?: T;
+        brandName?: T;
+        brandHighlight?: T;
+        tagline?: T;
+        customLogoUrl?: T;
+        bio?: T;
+      };
+  appearance?:
+    | T
+    | {
+        themePreset?: T;
+        customBgColor?: T;
+        customTextColor?: T;
+        accentColor?: T;
+        customAccentColor?: T;
+        socialIconStyle?: T;
+        layoutColumns?: T;
+        showSocialLinks?: T;
+        showCopyrightBar?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        facebook?: T;
+        twitter?: T;
+        pinterest?: T;
+        whatsapp?: T;
+        instagram?: T;
+        youtube?: T;
+        telegram?: T;
+        linkedin?: T;
+      };
+  columns?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              isHighlighted?: T;
+              openInNewTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  disclosure?:
+    | T
+    | {
+        showDisclosure?: T;
+        title?: T;
+        content?: T;
+      };
+  copyright?:
+    | T
+    | {
+        text?: T;
+        bottomLinks?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  cashbackVisibility?: T;
+  appearance?:
+    | T
+    | {
+        primaryAccent?: T;
+        heroBackgroundStyle?: T;
+      };
+  hero?:
+    | T
+    | {
+        kicker?: T;
+        title?: T;
+        subtitle?: T;
+        badgeText?: T;
+        cashbackPillLabel?: T;
+        autoSlideInterval?: T;
+        showOfficialBadge?: T;
+        bannerHoverPause?: T;
+        banners?:
+          | T
+          | {
+              storeName?: T;
+              title?: T;
+              subtitle?: T;
+              code?: T;
+              cashbackRate?: T;
+              storeRating?: T;
+              successRate?: T;
+              countryCode?: T;
+              bannerImage?: T;
+              linkUrl?: T;
+              id?: T;
+            };
+      };
+  howItWorks?:
+    | T
+    | {
+        kicker?: T;
+        title?: T;
+        subtitle?: T;
+        steps?:
+          | T
+          | {
+              stepNumber?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+      };
+  faqs?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        items?:
+          | T
+          | {
+              q?: T;
+              a?: T;
+              id?: T;
+            };
+      };
+  newsletter?:
+    | T
+    | {
+        heading?: T;
+        subtitle?: T;
+        buttonText?: T;
+      };
+  contact?:
+    | T
+    | {
+        supportEmail?: T;
+        partnershipsEmail?: T;
+        supportPhone?: T;
+        address?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

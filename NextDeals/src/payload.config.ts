@@ -1,5 +1,4 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import {
   lexicalEditor,
   FixedToolbarFeature,
@@ -9,6 +8,7 @@ import {
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
+import { getDatabaseUri, isCloudflareRuntime, isDatabaseConfigured } from './lib/db-config'
 let sharp: any = undefined
 try {
   sharp = (await import('sharp')).default
@@ -27,6 +27,7 @@ const CouponOffers = (await import('./collections/CouponOffers')).CouponOffers
 const CashbackOffers = (await import('./collections/CashbackOffers')).CashbackOffers
 const Stores = (await import('./collections/Stores')).Stores
 const Pages = (await import('./collections/Pages')).Pages
+const ContactMessages = (await import('./collections/ContactMessages')).ContactMessages
 
 // Globals for Header, Footer & Site/Homepage Settings
 const Header = (await import('./globals/Header')).Header
@@ -46,6 +47,16 @@ export default buildConfig({
   admin: {
     user: 'users',
     autoLogin: false,
+    meta: {
+      titleSuffix: ' | CouponKodee Admin',
+      icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/brand-mark.svg' }],
+    },
+    components: {
+      graphics: {
+        Logo: '/components/admin/AdminBrand#AdminLogo',
+        Icon: '/components/admin/AdminBrand#AdminIcon',
+      },
+    },
     importMap: {
       baseDir: dirname ? path.resolve(dirname) : process.cwd(),
     },
@@ -60,6 +71,7 @@ export default buildConfig({
     Pages,
     Media,
     NewsletterSubscribers,
+    ContactMessages,
     PriceHistory,
   ],
   globals: [
@@ -82,15 +94,14 @@ export default buildConfig({
     outputFile: dirname ? path.resolve(dirname, 'payload-types.ts') : path.resolve(process.cwd(), 'src/payload-types.ts'),
   },
   db: mongooseAdapter({
-    url: (process.env.MONGODB_URI || process.env.DATABASE_URI) || false,
+    url: isDatabaseConfigured() ? getDatabaseUri() : false,
     connectOptions: {
-      serverSelectionTimeoutMS: 3000,
-      connectTimeoutMS: 3000,
+      // Short on Workers to avoid request timeouts. Locally a busy machine (dev compiles,
+      // hot-reload reconnects) can exceed 3s, and a failed connect makes Payload exit the process.
+      serverSelectionTimeoutMS: isCloudflareRuntime() ? 3000 : 10000,
+      connectTimeoutMS: isCloudflareRuntime() ? 3000 : 10000,
       bufferCommands: false,
     },
   }),
   ...(sharp ? { sharp } : {}),
-  plugins: [
-    payloadCloudPlugin(),
-  ],
 })

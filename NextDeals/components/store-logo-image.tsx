@@ -32,7 +32,7 @@ export function StoreLogoImage({
   if (!src || error) {
     return (
       <div
-        className={`shrink-0 flex items-center justify-center font-black text-white shadow-sm ${bg} ${sizeClasses} ${className}`}
+        className={`shrink-0 flex items-center justify-center font-bold text-white shadow-sm ${bg} ${sizeClasses} ${className}`}
         title={alt}
       >
         <span>{initial}</span>

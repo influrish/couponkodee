@@ -1,16 +1,12 @@
 import type { CollectionConfig } from "payload"
+import { publicContentAccess } from "../access/roles"
 
 export const Media: CollectionConfig = {
   slug: "media",
   admin: {
     useAsTitle: "filename",
   },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
-  },
+  access: publicContentAccess,
   upload: {
     staticDir: "media",
     imageSizes: [

@@ -35,8 +35,9 @@ export default async function DynamicCmsPage({ params }: DynamicPageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl min-h-[60vh]">
+    <div className="container py-8 max-w-4xl min-h-[60vh]">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: page.title, href: `/p/${page.slug}` },
@@ -45,7 +46,7 @@ export default async function DynamicCmsPage({ params }: DynamicPageProps) {
 
       <article className="space-y-8 mt-6">
         <header className="border-b border-slate-200 pb-6">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
             {page.title}
           </h1>
           {page.subtitle && (
@@ -55,7 +56,7 @@ export default async function DynamicCmsPage({ params }: DynamicPageProps) {
           )}
         </header>
 
-        <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-[15px] whitespace-pre-wrap">
+        <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-md whitespace-pre-wrap">
           {page.body}
         </div>
       </article>

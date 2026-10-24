@@ -16,20 +16,24 @@
     "generate:types": "cross-env NODE_OPTIONS='--no-deprecation' payload generate:types",
     "docker:build": "docker build -t dealscope-payload .",
     "docker:run": "docker-compose up -d",
-    "seed": "node scripts/direct-mongodb-seed.js",
+    "seed": "tsx scripts/seed-complete-database.ts",
     "seed:payload": "tsx scripts/seed-payload-mongodb.ts",
     "seed:sample": "tsx scripts/seed-sample-offers.ts",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
-    "test": "pnpm run test:int && pnpm run test:e2e",
+    "test": "pnpm run test:unit && pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS='--no-deprecation --no-experimental-strip-types' pnpm exec playwright test",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --project int",
+    "db:local": "tsx scripts/local-mongo.ts",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --project unit",
+    "admin:reset-password": "tsx scripts/reset-admin-password.ts",
+    "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
-    "@aws-sdk/client-sts": "^3.859.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@payloadcms/db-mongodb": "3.49.0",
     "@payloadcms/next": "3.49.0",
-    "@payloadcms/payload-cloud": "3.49.0",
     "@payloadcms/richtext-lexical": "3.49.0",
     "@payloadcms/ui": "3.49.0",
     "@radix-ui/react-slot": "^1.0.2",
@@ -51,9 +55,8 @@
     "tailwindcss-animate": "1.0.7"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.20.11",
-    "wrangler": "^4.151.0",
     "@eslint/eslintrc": "^3.3.7",
+    "@opennextjs/cloudflare": "^1.20.11",
     "@playwright/test": "1.50.0",
     "@testing-library/react": "16.3.0",
     "@types/node": "22.5.4",
@@ -65,6 +68,7 @@
     "eslint": "^9.32.0",
     "eslint-config-next": "15.3.0",
     "jsdom": "26.1.0",
+    "mongodb-memory-server": "^10.4.3",
     "playwright": "1.50.0",
     "playwright-core": "1.50.0",
     "postcss": "8.5.0",
@@ -74,7 +78,8 @@
     "tsx": "^4.16.2",
     "typescript": "^5.7.3",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.2.3"
+    "vitest": "3.2.3",
+    "wrangler": "^4.151.0"
   },
   "engines": {
     "node": ">=20.9.0",

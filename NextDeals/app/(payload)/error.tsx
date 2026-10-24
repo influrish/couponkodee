@@ -36,10 +36,11 @@ export default function PayloadError({
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             <button
               onClick={() => reset()}
-              style={{ cursor: 'pointer', padding: '0.625rem 1.25rem', backgroundColor: '#0284c7', color: '#ffffff', border: 'none', borderRadius: '0.5rem', fontSize: '0.875rem', fontWeight: '600' }}
+              style={{ cursor: 'pointer', padding: '0.625rem 1.25rem', backgroundColor: '#7c3aed', color: '#ffffff', border: 'none', borderRadius: '0.5rem', fontSize: '0.875rem', fontWeight: '600' }}
             >
               Retry Connection
             </button>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- leaves the admin root layout, so a full page load is required */}
             <a
               href="/"
               style={{ padding: '0.625rem 1.25rem', backgroundColor: '#1e293b', color: '#e2e8f0', borderRadius: '0.5rem', textDecoration: 'none', fontSize: '0.875rem', fontWeight: '600' }}

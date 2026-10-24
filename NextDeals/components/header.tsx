@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import {
   ChevronDown,
   CircleDollarSign,
@@ -15,7 +15,9 @@ import {
 } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@/components/auth-context"
+import { BrandLogo } from "@/components/brand-logo"
 import { useCountry } from "@/components/country-context"
+import { localizeHref } from "@/lib/regions"
 import { useCashbackVisibility } from "@/components/cashback-context"
 import { CountrySelector } from "@/components/country-selector"
 import { HeaderData, defaultHeaderData } from "@/lib/cms-types"
@@ -29,7 +31,8 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const { user, logout } = useAuth()
-  const { country } = useCountry()
+  const { country, region } = useCountry()
+  const searchAction = localizeHref("/deals", region)
   const contextCashback = useCashbackVisibility()
   const isCashbackEnabled = propCashback !== undefined ? propCashback : contextCashback
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -165,12 +168,12 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
       {announcement.enabled && announcement.text && (isCashbackEnabled || (!/cashback/i.test(announcement.text) && announcement.link !== "/cashback")) && (
         <aside
           aria-label="Announcement"
-          className={`text-xs py-2 px-4 text-center font-bold border-b border-purple-900/20 shadow-xs relative z-50 ${announcementBgClasses}`}
+          className={`text-sm py-2 px-4 text-center font-bold border-b border-purple-900/20 shadow-xs relative z-50 ${announcementBgClasses}`}
           style={Object.keys(customAnnouncementStyle).length > 0 ? customAnnouncementStyle : undefined}
         >
-          <div className="container mx-auto flex items-center justify-center gap-2 flex-wrap">
+          <div className="container flex items-center justify-center gap-2 flex-wrap">
             {announcement.badge && (
-              <span className="bg-white/20 text-white px-2 py-0.5 rounded-full text-xs uppercase font-black tracking-wider">
+              <span className="bg-white/20 text-white px-2 py-0.5 rounded-full text-xs uppercase font-bold tracking-wider">
                 {announcement.badge}
               </span>
             )}
@@ -189,44 +192,31 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
         className={`site-header sticky top-0 z-40 transition-colors ${navbarBgClasses}`}
         style={Object.keys(customNavbarStyle).length > 0 ? customNavbarStyle : undefined}
       >
-        <div className="container mx-auto px-4">
+        <div className="container">
           <div className="flex h-16 sm:h-[72px] items-center justify-between gap-2 sm:gap-4 lg:gap-6">
             {/* Logo */}
-            <Link href="/" className="brand-mark shrink-0">
-              {brand.customLogoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={brand.customLogoUrl}
-                  alt={`${(brand.brandName || "Coupon").replace(/^c/i, "C")}${(brand.brandHighlight || "Kodee").replace(/^k/i, "K")}`}
-                  className="h-[35px] sm:h-9 w-auto object-contain"
-                />
-              ) : (
-                <span className="text-xl sm:text-2xl font-black tracking-tight inline-flex items-center">
-                  <span className={navbarBg === "dark" ? "text-white" : "text-slate-900"}>
-                    {(brand.brandName || "Coupon").replace(/^c/i, "C")}
-                  </span>
-                  <span className="text-purple-600">
-                    {(brand.brandHighlight || "Kodee").replace(/^k/i, "K")}
-                  </span>
-                </span>
-              )}
-            </Link>
+            <BrandLogo
+              brandName={brand.brandName}
+              brandHighlight={brand.brandHighlight}
+              customLogoUrl={brand.customLogoUrl}
+              tone={navbarBg === "dark" ? "light" : "dark"}
+            />
 
 
             {/* Header Search Bar (Desktop) */}
             {features.showSearch && (
               <div className="hidden lg:flex flex-1 max-w-sm xl:max-w-md mx-2">
-                <form action="/deals" method="GET" className="relative w-full">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <form action={searchAction} method="GET" className="relative w-full">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                   <input
                     type="text"
                     name="q"
                     placeholder={search.placeholder || "Search 500+ stores, coupons or deals..."}
-                    className="w-full pl-10 pr-20 py-2 rounded-full border border-slate-300 bg-slate-50 focus:bg-white focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-100 text-sm text-slate-800 transition-all"
+                    className="w-full text-ellipsis pl-10 pr-24 py-2 rounded-full border border-slate-300 bg-slate-50 focus:bg-white focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-100 text-sm text-slate-800 transition-all"
                   />
                   <button
                     type="submit"
-                    className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-3.5 py-1 ${headerAccentConfig.searchBtn} text-white rounded-full text-xs font-bold transition-colors`}
+                    className={`absolute right-1.5 top-1/2 -translate-y-1/2 px-3.5 py-1 ${headerAccentConfig.searchBtn} text-white rounded-full text-sm font-semibold transition-colors`}
                   >
                     {search.buttonText || "Search"}
                   </button>
@@ -235,19 +225,19 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
             )}
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            <nav className="hidden xl:flex items-center space-x-1 lg:space-x-2">
               {menuItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.url}
                   target={item.openInNewTab ? "_blank" : undefined}
                   rel={item.openInNewTab ? "noopener noreferrer" : undefined}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 ${headerAccentConfig.menuHover} transition-all flex items-center gap-1.5`}
+                  className={`px-2.5 py-1.5 rounded-lg text-sm font-semibold text-slate-700 ${headerAccentConfig.menuHover} transition-all flex items-center gap-1.5`}
                 >
                   {item.label}
                   {item.badge && (
                     <span
-                      className={`rounded-full text-xs px-2 py-0.5 font-black uppercase tracking-wider ${
+                      className={`rounded-full text-xs px-2 py-0.5 font-bold uppercase tracking-wider ${
                         item.isCashback
                           ? "bg-emerald-100 text-emerald-800"
                           : "bg-purple-100 text-purple-800"
@@ -271,25 +261,25 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                   <button
                     type="button"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="inline-flex items-center gap-2 py-1.5 px-3 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all text-xs font-bold text-slate-800 shadow-xs"
+                    className="inline-flex items-center gap-2 py-1.5 px-3 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all text-sm font-semibold text-slate-800 shadow-xs"
                   >
-                    <div className="h-7 w-7 rounded-full bg-purple-700 text-white flex items-center justify-center font-black text-xs">
+                    <div className="h-7 w-7 rounded-full bg-purple-700 text-white flex items-center justify-center font-bold text-xs">
                       {firstName.charAt(0).toUpperCase()}
                     </div>
                     <span className="truncate max-w-[100px]">Hi, {firstName}</span>
                     {isCashbackEnabled && (
-                      <span className="bg-emerald-100 text-emerald-800 text-xs font-black px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                      <span className="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
                         <Wallet className="h-3 w-3" />
                         ₹{user.walletBalance || 50}
                       </span>
                     )}
-                    <ChevronDown className="h-3 w-3 text-slate-400" />
+                    <ChevronDown className="h-3 w-3 text-slate-500" />
                   </button>
 
                   {userMenuOpen && (
                     <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in slide-in-from-top-2">
                       <div className="px-4 py-2 border-b border-slate-100">
-                        <p className="text-xs font-bold text-slate-900 truncate">{user.name}</p>
+                        <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
                         <p className="text-xs text-slate-500 truncate">{user.email}</p>
                       </div>
 
@@ -298,7 +288,7 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                           <Link
                             href="/cashback"
                             onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
+                            className="flex items-center justify-between px-4 py-2 text-sm font-medium text-slate-700 hover:bg-purple-50 hover:text-purple-700"
                           >
                             <span className="flex items-center gap-2">
                               <CircleDollarSign className="h-4 w-4 text-emerald-600" />
@@ -312,7 +302,7 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                           <Link
                             href="/admin"
                             onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-purple-700 bg-purple-50/50 hover:bg-purple-100"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-700 bg-purple-50/50 hover:bg-purple-100"
                           >
                             <Settings className="h-4 w-4 text-purple-600" />
                             Admin Panel
@@ -327,7 +317,7 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                             setUserMenuOpen(false)
                             logout()
                           }}
-                          className="flex w-full items-center gap-2 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                          className="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                         >
                           <LogOut className="h-4 w-4" />
                           Sign Out
@@ -341,13 +331,13 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                 <div className="hidden sm:flex items-center gap-2">
                   <Link
                     href="/login"
-                    className={`px-3 py-1.5 text-xs font-bold text-slate-700 ${headerAccentConfig.loginHover} transition-colors`}
+                    className={`px-3 py-1.5 text-sm font-semibold text-slate-700 ${headerAccentConfig.loginHover} transition-colors`}
                   >
                     {features.loginLabel || "Sign In"}
                   </Link>
                   <Link
                     href="/signup"
-                    className={`px-3.5 py-1.5 rounded-full ${headerAccentConfig.signupBtn} text-xs font-bold shadow-sm transition-all hover:shadow`}
+                    className={`px-3.5 py-1.5 rounded-full ${headerAccentConfig.signupBtn} text-sm font-semibold shadow-sm transition-all hover:shadow`}
                   >
                     {features.signupLabel || "Join Free"}
                   </Link>
@@ -358,8 +348,9 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
               <button
                 type="button"
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none"
+                className="xl:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
                 aria-label="Toggle Navigation Menu"
+                aria-expanded={mobileOpen}
               >
                 {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -370,11 +361,11 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
 
         {/* Mobile Navigation Drawer */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-4 animate-in fade-in slide-in-from-top-2">
+          <div className="xl:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-4 animate-in fade-in slide-in-from-top-2">
             {/* Mobile Search */}
             {features.showSearch && (
-              <form action="/deals" method="GET" className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <form action={searchAction} method="GET" className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <input
                   type="text"
                   name="q"
@@ -398,7 +389,7 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                   <span>{item.label}</span>
                   {item.badge && (
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-black ${
+                      className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                         item.isCashback
                           ? "bg-emerald-100 text-emerald-800"
                           : "bg-purple-100 text-purple-800"
@@ -417,16 +408,16 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                 <div className="space-y-2">
                   <div className="flex items-center justify-between p-3 rounded-xl bg-purple-50 border border-purple-100">
                     <div className="flex items-center gap-2.5">
-                      <div className="h-8 w-8 rounded-full bg-purple-700 text-white flex items-center justify-center font-black text-xs">
+                      <div className="h-8 w-8 rounded-full bg-purple-700 text-white flex items-center justify-center font-bold text-xs">
                         {firstName.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-xs font-black text-slate-900">{user.name}</p>
-                        <p className="text-xs font-semibold text-slate-500">{user.email}</p>
+                        <p className="text-sm font-semibold text-slate-900">{user.name}</p>
+                        <p className="text-xs font-medium text-slate-500">{user.email}</p>
                       </div>
                     </div>
                     {isCashbackEnabled && (
-                      <span className="text-xs font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                         ₹{user.walletBalance || 50}
                       </span>
                     )}
@@ -437,7 +428,7 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                       <Link
                         href="/admin"
                         onClick={() => setMobileOpen(false)}
-                        className="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold"
+                        className="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold"
                       >
                         Admin Panel
                       </Link>
@@ -448,7 +439,7 @@ export function Header({ initialData, isCashbackEnabled: propCashback }: HeaderP
                         setMobileOpen(false)
                         logout()
                       }}
-                      className="flex-1 text-center py-2 rounded-xl bg-red-50 text-red-600 text-xs font-bold"
+                      className="flex-1 text-center py-2 rounded-xl bg-red-50 text-red-600 text-sm font-semibold"
                     >
                       Sign Out
                     </button>

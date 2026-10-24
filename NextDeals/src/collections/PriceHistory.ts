@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload"
+import { publicContentAccess } from "../access/roles"
 
 export const PriceHistory: CollectionConfig = {
   slug: "price-history",
@@ -6,12 +7,7 @@ export const PriceHistory: CollectionConfig = {
     useAsTitle: "product",
     defaultColumns: ["product", "price", "createdAt"],
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
-  },
+  access: publicContentAccess,
   // MongoDB indexes for time-series data optimization
   // indexes: [
   //   {

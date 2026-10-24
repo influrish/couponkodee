@@ -10,29 +10,51 @@ const config: Config = {
     "*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    // Layout and typography resolve to the tokens in app/globals.css.
     container: {
       center: true,
-      padding: "2rem",
+      padding: "var(--container-gutter)",
+      // Fluid below this width, capped above it. Media queries cannot read CSS
+      // variables, so keep this literal in sync with --container-max.
       screens: {
-        "2xl": "1400px",
+        "2xl": "1360px",
       },
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        heading: ['var(--font-heading)', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ["var(--font-sans)"],
+        // Alias kept so existing font-heading classes use the same single family
+        heading: ["var(--font-sans)"],
       },
       fontSize: {
-        xs: ['0.875rem', { lineHeight: '1.25rem' }], // 14px - strictly enforced minimum text size
-        sm: ['0.9375rem', { lineHeight: '1.375rem' }], // 15px
-        base: ['1rem', { lineHeight: '1.5rem' }], // 16px
-        lg: ['1.125rem', { lineHeight: '1.75rem' }], // 18px
-        xl: ['1.25rem', { lineHeight: '1.75rem' }], // 20px
-        '2xl': ['1.5rem', { lineHeight: '2rem' }], // 24px
-        '3xl': ['1.875rem', { lineHeight: '2.25rem' }], // 30px
-        '4xl': ['2.25rem', { lineHeight: '2.5rem' }], // 36px
-        '5xl': ['3rem', { lineHeight: '1.1' }], // 48px
-        '6xl': ['3.75rem', { lineHeight: '1.1' }], // 60px
+        "2xs": ["var(--text-2xs)", { lineHeight: "var(--leading-2xs)" }],
+        xs: ["var(--text-xs)", { lineHeight: "var(--leading-xs)" }],
+        sm: ["var(--text-sm)", { lineHeight: "var(--leading-sm)" }],
+        md: ["var(--text-md)", { lineHeight: "var(--leading-md)" }],
+        base: ["var(--text-base)", { lineHeight: "var(--leading-base)" }],
+        lg: ["var(--text-lg)", { lineHeight: "var(--leading-lg)" }],
+        xl: ["var(--text-xl)", { lineHeight: "var(--leading-xl)" }],
+        "2xl": ["var(--text-2xl)", { lineHeight: "var(--leading-2xl)" }],
+        "3xl": ["var(--text-3xl)", { lineHeight: "var(--leading-3xl)" }],
+        "4xl": ["var(--text-4xl)", { lineHeight: "var(--leading-4xl)" }],
+        "5xl": ["var(--text-5xl)", { lineHeight: "var(--leading-5xl)" }],
+        "6xl": ["var(--text-6xl)", { lineHeight: "var(--leading-6xl)" }],
+      },
+      fontWeight: {
+        normal: "var(--weight-normal)",
+        medium: "var(--weight-medium)",
+        semibold: "var(--weight-semibold)",
+        bold: "var(--weight-bold)",
+        extrabold: "var(--weight-extrabold)",
+        black: "var(--weight-black)",
+      },
+      letterSpacing: {
+        tighter: "var(--tracking-tighter)",
+        tight: "var(--tracking-tight)",
+        normal: "var(--tracking-normal)",
+        wide: "var(--tracking-wide)",
+        wider: "var(--tracking-wider)",
+        widest: "var(--tracking-widest)",
       },
       colors: {
         border: "hsl(var(--border))",

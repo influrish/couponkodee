@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload"
+import { anyone, isStaff } from "../access/roles"
 
 export const NewsletterSubscribers: CollectionConfig = {
   slug: "newsletter-subscribers",
@@ -7,10 +8,10 @@ export const NewsletterSubscribers: CollectionConfig = {
     defaultColumns: ["email", "isActive", "createdAt"],
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user),
-    create: () => true,
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    read: isStaff,
+    create: anyone,
+    update: isStaff,
+    delete: isStaff,
   },
   fields: [
     {

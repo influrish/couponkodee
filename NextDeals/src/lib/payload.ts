@@ -1,6 +1,9 @@
 import { getPayload, type Payload } from 'payload'
 import payloadConfig from '../payload.config'
+import { isDatabaseConfigured } from './db-config'
+import { isDatabaseReachable } from './db-health'
 
+const MONGOOSE_CONNECTED = 1
 
 declare global {
   var payload: {
@@ -18,9 +21,8 @@ if (!cached) {
 type InitOptions = Parameters<typeof getPayload>[0]
 
 export const getPayloadClient = async (initOptions?: Partial<InitOptions>): Promise<Payload> => {
-  const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URI
-  if (!mongoUri) {
-    throw new Error('MONGODB_URI is required to connect to database')
+  if (!isDatabaseConfigured()) {
+    throw new Error('MONGODB_URI is missing or invalid; set it in .env.local (see .env.example)')
   }
 
   if (!process.env.PAYLOAD_SECRET) {
@@ -28,27 +30,24 @@ export const getPayloadClient = async (initOptions?: Partial<InitOptions>): Prom
   }
 
   if (cached.client) {
+    // Mongoose reconnects in the background; until it does, fail fast so callers
+    // use their fallbacks instead of waiting out the server-selection timeout per query.
+    const readyState = (cached.client.db as { connection?: { readyState?: number } }).connection?.readyState
+    if (readyState !== undefined && readyState !== MONGOOSE_CONNECTED) {
+      throw new Error('Database connection lost; reconnecting in the background')
+    }
     return cached.client
   }
 
-  if (process.env.ENV === 'dev') {
-    // Bypass cache in dev mode
-    const freshPayload = await getPayload({
-      config: payloadConfig,
-      ...(initOptions as any),
-    }).then((payload) => {
-      console.log('Fresh payload collections:', Object.keys(payload.collections))
-      return payload
-    })
-    return freshPayload
+  // Payload exits the process if its first connection fails, so check first.
+  if (!cached.promise && !(await isDatabaseReachable())) {
+    throw new Error('Database is unreachable; retrying shortly')
+  }
 
-  } else if (!cached.promise) {
+  if (!cached.promise) {
     cached.promise = getPayload({
       config: payloadConfig,
       ...(initOptions as any),
-    }).then((payload) => {
-      console.log('Payload initialized with collections:', Object.keys(payload.collections))
-      return payload
     })
   }
 

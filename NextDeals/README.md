@@ -1,237 +1,143 @@
-# couponkodee - Coupons, Deals & Cashback with Payload CMS
+# CouponKodee
 
-A modern, scalable affiliate site built with Next.js 14, Payload CMS, and designed for growth from 10K to 10M+ visitors.
+Coupons, deals and cashback storefront with a Payload CMS admin panel.
 
-## 🚀 Architecture Overview
+- **Stack:** Next.js 15 (App Router), React 19, Payload CMS 3.49, MongoDB, Tailwind CSS, pnpm
+- **Production:** Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
+- **Local:** runs fully offline after the first install (local MongoDB, local media storage)
 
-\`\`\`mermaid
-graph TB
-    A[Users] --> B[Vercel Edge Network]
-    B --> C[Next.js Frontend]
-    C --> D[Payload CMS API]
-    D --> E[PostgreSQL Database]
-    
-    F[GitHub Actions] --> G[Price Tracking]
-    G --> D
-    G --> H[ISR Revalidation]
-    H --> C
-    
-    I[Admin Panel] --> D
-    J[CSV Imports] --> D
-    
-    subgraph "Phase 1: MVP ($5-15/month)"
-        K[DigitalOcean Droplet]
-        K --> D
-        K --> E
-    end
-    
-    subgraph "Phase 2: Growth ($50-150/month)"
-        L[Managed PostgreSQL]
-        M[Redis Cache]
-        N[CDN]
-    end
-    
-    subgraph "Phase 3: Scale ($500+/month)"
-        O[Kubernetes Cluster]
-        P[Microservices]
-        Q[Real-time APIs]
-    end
-\`\`\`
+## Quick start (local)
 
-## 🛠 Tech Stack
+Requirements: Node.js 20.9+ and pnpm 9 or 10 (`npm i -g pnpm`, or prefix commands with `npx pnpm@10`).
 
-### Backend (Payload CMS)
-- **CMS**: Payload CMS v2.8+ with TypeScript
-- **Database**: PostgreSQL with Payload's postgres adapter
-- **Admin Panel**: Built-in React admin interface
-- **API**: Automatic REST & GraphQL APIs
-- **Collections**: Products, Categories, Users, Newsletter, Media
+```bash
+cd NextDeals
+pnpm install
+cp .env.example .env.local        # then set PAYLOAD_SECRET (openssl rand -base64 32)
 
-### Frontend (Next.js 14)
-- **Framework**: Next.js 14 with App Router
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Deployment**: Vercel (Free tier → Pro)
-- **Caching**: Edge caching + ISR (1 hour revalidation)
+pnpm db:local                     # terminal 1: local MongoDB on 127.0.0.1:27017 (keep open)
+pnpm seed                         # terminal 2: stores, coupons, deals, cashback + admin user
+pnpm dev                          # http://localhost:3000, admin at http://localhost:3000/admin
+```
 
-## 🚀 Quick Start
+`pnpm db:local` downloads a MongoDB binary once (about 70 MB, cached in `node_modules/.cache`) and stores data in `.data/mongodb`, so data survives restarts. If you already run MongoDB (Homebrew, Docker or Atlas), skip it and point `MONGODB_URI` at your server.
 
-### 1. Clone and Install
-\`\`\`bash
-git clone <repository-url>
-cd dealscope-affiliate-site
-npm install
-\`\`\`
+`pnpm seed` is idempotent: re-running it only adds what is missing. It creates the admin account from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`. If no password is set, it generates one and prints it once.
 
-### 2. Environment Setup
-\`\`\`bash
-cp .env.example .env.local
-# Edit .env.local with your database credentials and Payload secret
-\`\`\`
+The storefront also works **without a database**: every page falls back to the static catalogue in `lib/stores-data.ts`. The admin panel then shows a setup screen instead of the login.
 
-### 3. Database Setup
-\`\`\`bash
-# Create PostgreSQL database
-createdb dealscope
+## Environment variables
 
-# Set DATABASE_URL in .env.local
-DATABASE_URL=postgresql://username:password@localhost:5432/dealscope
-\`\`\`
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `MONGODB_URI` | Yes, for CMS | MongoDB connection string. Local: `mongodb://127.0.0.1:27017/couponkodee` |
+| `PAYLOAD_SECRET` | Yes, for CMS | Random string (32+ chars) used to sign auth tokens |
+| `NEXT_PUBLIC_SITE_URL` | No | Public base URL; defaults to `http://localhost:3000` |
+| `SEED_ADMIN_EMAIL` | No | Admin account for `pnpm seed` / `pnpm admin:reset-password` |
+| `SEED_ADMIN_PASSWORD` | No | Its password (12+ chars). Generated and printed if empty |
+| `OUTBOUND_ALLOWED_HOSTS` | No | Extra comma-separated hosts `/out` may redirect to (e.g. affiliate networks) |
+| `LOCAL_MONGO_PORT`, `LOCAL_MONGO_DATA_DIR` | No | Overrides for `pnpm db:local` |
 
-### 4. Initialize Payload CMS
-\`\`\`bash
-# Build Payload admin panel
-npm run build:payload
+Never commit `.env.local`. In production, store `MONGODB_URI` and `PAYLOAD_SECRET` as encrypted Cloudflare secrets.
 
-# Seed initial data
-node scripts/seed-payload.js
-\`\`\`
+## Scripts
 
-### 5. Development
-\`\`\`bash
-# Start development server
-npm run dev
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Development server on port 3000 |
+| `pnpm build` / `pnpm start` | Production build and server |
+| `pnpm db:local` | Local persistent MongoDB (no system install needed) |
+| `pnpm seed` | Idempotent seed of categories, stores, offers and admin user |
+| `pnpm admin:reset-password` | Set or rotate the admin password from env (or generate one) |
+| `pnpm typecheck` | TypeScript check (`next build` skips type errors, so run this) |
+| `pnpm test:unit` | Unit tests, no database needed |
+| `pnpm test:int` | Integration tests against `MONGODB_URI` (skipped if not configured) |
+| `pnpm test:e2e:install` / `pnpm test:e2e` | Install Chromium once, then run Playwright tests on port 3100 |
+| `pnpm generate:types` | Regenerate `src/payload-types.ts` after changing collections |
+| `pnpm preview` / `pnpm deploy` | Cloudflare Workers preview and deploy (OpenNext) |
 
-# Access admin panel at http://localhost:3000/admin
-# Create your administrator account at /admin/create-first-user
-\`\`\`
+## Project layout
 
-## 🎛 Payload CMS Collections
+```
+app/(frontend)/      Storefront pages (own root layout, header, footer, 404/error pages)
+app/(payload)/       Payload admin panel and REST API (/admin, /api/*)
+app/out/route.ts     Affiliate click tracking redirect (see below)
+app/api/             Custom endpoints: auth/register, newsletter, contact, cashback-visibility
+components/          UI components and client contexts (auth, country, cashback)
+lib/                 Data access with static fallbacks, helpers (outbound links, rate limit)
+src/collections/     Payload collections; src/access/roles.ts holds access rules
+src/lib/             Payload client, DB config and health check
+scripts/             Seeding, local MongoDB, admin password reset, maintenance scripts
+tests/               unit/, int/ (Payload + MongoDB), e2e/ (Playwright)
+```
 
-### Products Collection
-- **Title, Slug, Description**: Product information
-- **Pricing**: Original price, current price, auto-calculated discount
-- **Category**: Relationship to categories
-- **Images**: Media uploads with responsive sizes
-- **Features**: Key product specifications
-- **Status**: Featured, trending, active flags
-- **SEO**: Meta tags and descriptions
+## How things work
 
-### Categories Collection
-- **Name, Slug, Description**: Category information
-- **Parent**: Support for subcategories
-- **Product Count**: Auto-calculated
-- **SEO**: Meta optimization
+### Data access and resilience
 
-### Users Collection
-- **Authentication**: Built-in user management
-- **Roles**: Admin, Editor, User levels
-- **Access Control**: Collection-level permissions
+Storefront data goes through `lib/db-stores.ts` and `lib/cms-settings.ts`. Each call tries Payload first and falls back to static data on any error. `src/lib/payload.ts` and `src/lib/db-health.ts` keep that fallback fast:
 
-### Newsletter Collection
-- **Email Management**: Subscriber tracking
-- **Preferences**: Category interests, frequency
-- **Source Tracking**: Signup attribution
+- Payload's MongoDB adapter calls `process.exit(1)` if its **first** connection fails. Every entry point that can initialise Payload (data helpers, `/admin`, `/api/*`) pings MongoDB first, with results cached for 15 to 30 s. An unreachable database therefore degrades the site instead of killing the server.
+- If an established connection drops, queries fail fast until Mongoose reconnects, so pages don't wait out timeouts.
 
-## 📊 Admin Panel Features
+### Region URLs (`/in`, `/us`, ...)
 
-### Content Management
-- **Rich Text Editor**: For product descriptions
-- **Media Library**: Image upload and management
-- **Bulk Operations**: CSV imports and exports
-- **Version Control**: Content revisions and drafts
+Every storefront page is served under a region prefix: `/in/stores`, `/us/store/amazon`, `/uk/deals?q=nike`. Regions come from `lib/countries-data.ts`: add a country there and its URLs work everywhere.
 
-### E-commerce Features
-- **Price Tracking**: Historical price data
-- **Affiliate Links**: Managed affiliate URLs
-- **Product Status**: Featured/trending controls
-- **Category Management**: Hierarchical organization
+- `middleware.ts` serves `/<region>/<path>` from the normal `app/(frontend)` routes, so no page folders are duplicated. URLs without a region redirect to the saved region (cookie), then the visitor's country (Cloudflare `cf-ipcountry`), then India. Unsupported countries go to `/global`.
+- Choosing a region anywhere (header or page filters) calls `setCountry`, which swaps the prefix on the current page.
+- Use `Link` from `@/components/localized-link` (a drop-in for `next/link`) and `localizeHref()` from `lib/regions.ts` for hand-built URLs. `/admin`, `/api`, `/out`, `/media` and static files are never prefixed.
+- Each page outputs a canonical URL and `hreflang` alternates for every region (`x-default` → `/global`).
 
-### User Management
-- **Role-based Access**: Admin, Editor, User roles
-- **Authentication**: Secure login system
-- **Permissions**: Fine-grained access control
+### Access control
 
-## 🔄 Data Flow
+Rules live in `src/access/roles.ts`:
 
-1. **Admin creates content** in Payload CMS admin panel
-2. **Next.js fetches data** via Payload's Local API
-3. **ISR regenerates** static pages every hour
-4. **Vercel Edge Cache** serves content globally
-5. **Price tracking updates** products automatically
+- **Public:** read stores, offers, products, categories, pages and globals; subscribe to the newsletter.
+- **Shoppers** (`role: user`): read and update only their own account. They can't change `role`, can't edit content, and can't open `/admin`.
+- **Staff** (`admin`, `editor`): manage content, subscribers and contact messages. Only admins manage users and roles.
 
-## 📈 Scaling Pathway
+Public sign-up goes through `/api/auth/register`, which always creates `role: user`.
 
-| Phase | Traffic | Infrastructure | Monthly Cost | Key Features |
-|-------|---------|---------------|--------------|--------------|
-| **MVP** | 10K-100K | Single Droplet + Vercel | $5-15 | Payload CMS, ISR, File uploads |
-| **Growth** | 100K-1M | Managed DB + Cloud Storage | $50-150 | Real-time sync, CDN, Redis |
-| **Scale** | 1M-10M+ | Kubernetes + Microservices | $500+ | Auto-scaling, Global distribution |
+### Outbound affiliate links (`/out`)
 
-## 🚀 Production Deployment
+```
+/out?url=<merchantUrl>&merchant=<slug>&code=<couponCode>&subid=<optional>
+```
 
-### Option A: Single Server (MVP)
-\`\`\`bash
-# Build for production
-npm run build
+The route adds `utm_source=couponkodee`, `utm_medium=affiliate`, `utm_campaign=<merchant>_deal`, `subid` and `coupon`, then returns a 307 redirect. `subid` is taken from the query, then from the logged-in user's id, then defaults to `couponkodee`.
 
-# Start production server
-npm start
+Only http(s) URLs on hosts of known stores or offers (plus `OUTBOUND_ALLOWED_HOSTS`) are allowed. Anything else falls back to the store page, so `/out` can't be abused as an open redirect.
 
-# Admin panel available at /admin
-\`\`\`
+### Rate limiting
 
-### Option B: Docker Deployment
-\`\`\`bash
-# Build and run with Docker
-docker-compose up -d
+`/api/auth/register`, `/api/newsletter` and `/api/contact` are rate-limited per IP in memory (`lib/rate-limit.ts`). That state is per process, or per isolate on Cloudflare. Use Cloudflare Rate Limiting rules for stricter guarantees in production.
 
-# Access admin panel at http://localhost:3000/admin
-\`\`\`
+## Design system
 
-### Option C: Separate Services
-- Deploy Next.js to Vercel
-- Deploy Payload CMS to Railway/Render/DigitalOcean
-- Use managed PostgreSQL (Neon/Supabase/Railway)
+Typography, colour, spacing and layout come from one set of tokens on `:root` in `app/globals.css`. `tailwind.config.ts` maps Tailwind's utilities onto those tokens, so `text-sm`, `font-bold`, `tracking-wide` and `container` all resolve there. To restyle the site, change a token, not individual pages.
 
-## 🎨 Content Strategy
+| Token group | Where it applies | Notes |
+| --- | --- | --- |
+| Font | `--font-sans` | One family, Plus Jakarta Sans, self-hosted from `@fontsource-variable` (no Google request; works offline) |
+| Type scale | `text-2xs` to `text-6xl` | `2xs` 11px (micro badges only), `xs` 13, `sm` 14 (buttons, secondary), `md` 15 (card titles), `base` 16 (body). `2xl` and up are fluid with `clamp()`: section headings 24–30px, hero up to 52px |
+| Weights | `font-medium` to `font-black` | `bold` = 650, `extrabold` = 700, `black` = 750 (display headings only) |
+| Colour | `--foreground`, `--muted-foreground` and others | Body text slate-900, secondary text slate-600 (WCAG AA on white) |
+| Layout | `container`, `--section-space`, `--card-padding` | Container max 1360px with 16/24/32px gutters (keep `screens["2xl"]` in sync with `--container-max`) |
 
-### Product Management
-1. **Import via CSV**: Bulk product uploads
-2. **Manual Entry**: Individual product creation
-3. **API Integration**: Connect to affiliate networks
-4. **Price Monitoring**: Automated price updates
+Conventions:
 
-### Category Structure
-- **Electronics**: Gadgets, phones, computers
-- **Home & Garden**: Furniture, appliances, tools
-- **Fashion**: Clothing, shoes, accessories
-- **Health & Beauty**: Skincare, wellness, beauty
+- Use scale utilities (`text-sm`, `text-3xl`), never arbitrary sizes like `text-[15px]`. Larger headings need one class: the fluid tokens replace `text-2xl sm:text-3xl md:text-4xl` chains.
+- Use plain `container` for page width. Don't add `mx-auto` or `px-*` to it.
+- Shared building blocks: `BrandLogo` (header, footer, auth pages), `Breadcrumb` (`variant="bar"` under the header), `StoreTile` / `VerifiedName`, `PageSkeleton`, and the `section-*` classes for homepage sections.
+- The storefront is light-only (`forcedTheme="light"`). Dark mode would need dark variants throughout the components first.
+- `cn()` (`lib/utils.ts`) knows the custom `text-2xs` / `text-md` sizes. Register any new size token there too.
 
-### SEO Optimization
-- **Auto-generated slugs** from titles
-- **Meta tags** for all content types
-- **Schema markup** for products
-- **Sitemap generation** from Payload data
+## Production (Cloudflare Workers)
 
-## 🔧 Key Features
+Pushing to `main` on `influrish/couponkodee` triggers the Cloudflare build (`pnpm deploy` runs `opennextjs-cloudflare build && deploy`). Required secrets: `MONGODB_URI` (Atlas, with the IP access list allowing Cloudflare egress) and `PAYLOAD_SECRET`. Set `NEXT_PUBLIC_SITE_URL` as a plain variable.
 
-### Payload CMS Benefits
-- **Type-safe**: Full TypeScript support
-- **Flexible**: Customizable fields and collections
-- **Scalable**: Built for enterprise applications
-- **Developer-friendly**: Code-first configuration
-- **Self-hosted**: Full control over your data
+Known production limitations:
 
-### Performance Optimization
-- **ISR**: 1-hour revalidation for optimal performance
-- **Edge Caching**: Vercel's global edge network
-- **Image Optimization**: Payload's responsive images
-- **Lazy Loading**: Components load on demand
-
-## 🛡 Security & Access Control
-
-### Authentication
-- **Secure login** with bcrypt password hashing
-- **JWT tokens** for API authentication
-- **Role-based access** control
-- **CSRF protection** built-in
-
-### Data Protection
-- **Environment variables** for sensitive data
-- **Database encryption** support
-- **File upload validation** with type checking
-- **Rate limiting** for API endpoints
-
----
-
-*Built with ❤️ using Payload CMS for scalable affiliate marketing*
+- Media uploads use the local `media/` folder, which Workers can't write to. Production uploads need an object-storage adapter (for example R2/S3 via `@payloadcms/storage-s3`).
+- `sharp` (image resizing) isn't available on Workers, so uploaded images aren't resized there.

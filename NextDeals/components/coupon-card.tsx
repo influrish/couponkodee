@@ -40,6 +40,7 @@ function getDiscountBadge(discount?: string | null, title?: string): string {
   return "Verified Offer"
 }
 
+// Cashback offers are rendered by CashbackCard, never as coupons.
 export function CouponCard({ coupon }: CouponCardProps) {
   if (
     /cashback/i.test(coupon.title) ||
@@ -48,17 +49,20 @@ export function CouponCard({ coupon }: CouponCardProps) {
   ) {
     return null
   }
+  return <CouponCardContent coupon={coupon} />
+}
 
+function CouponCardContent({ coupon }: CouponCardProps) {
   const [copied, setCopied] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [logoError, setLogoError] = useState(false)
-  const redirectTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const copyResetTimerRef = useRef<NodeJS.Timeout | null>(null)
   const logo = getBrandLogo(coupon.merchant)
   const discountBadge = getDiscountBadge(coupon.discount, coupon.title)
 
   useEffect(() => {
     return () => {
-      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current)
+      if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current)
     }
   }, [])
 
@@ -72,7 +76,8 @@ export function CouponCard({ coupon }: CouponCardProps) {
       navigator.clipboard.writeText(coupon.code).catch(() => {})
     }
     setCopied(true)
-    setTimeout(() => setCopied(false), 3500)
+    if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current)
+    copyResetTimerRef.current = setTimeout(() => setCopied(false), 3500)
     setIsModalOpen(true)
 
     // Open store in another tab / new page
@@ -87,7 +92,6 @@ export function CouponCard({ coupon }: CouponCardProps) {
   }
 
   const handleCloseModal = () => {
-    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current)
     setIsModalOpen(false)
   }
 
@@ -101,7 +105,7 @@ export function CouponCard({ coupon }: CouponCardProps) {
         <div className="sm:hidden flex flex-col items-center text-center">
           {/* 1. Brand Name (Centered, prominent, matching reference spacing) */}
           <div className="flex items-center justify-center w-full">
-            <span className="text-[16px] font-extrabold text-slate-900 tracking-tight truncate text-center">
+            <span className="text-base font-extrabold text-slate-900 tracking-tight truncate text-center">
               {coupon.merchant}
             </span>
           </div>
@@ -127,7 +131,7 @@ export function CouponCard({ coupon }: CouponCardProps) {
 
           {/* 3. Offer Details / Title (Centered, 2-line consistent height) */}
           <div className="flex items-center justify-center w-full min-h-[2.4rem]">
-            <h3 className="text-[13px] font-semibold text-slate-800 leading-snug line-clamp-2 text-center">
+            <h3 className="text-xs font-semibold text-slate-800 leading-snug line-clamp-2 text-center">
               {cleanOfferTitle(coupon.title, coupon.discount)}
             </h3>
           </div>
@@ -158,7 +162,7 @@ export function CouponCard({ coupon }: CouponCardProps) {
               </span>
             </div>
 
-            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+            <span className="shrink-0 inline-flex items-center gap-1 text-2xs font-semibold text-emerald-600">
               <BadgeCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
               <span>Verified</span>
             </span>
@@ -166,7 +170,7 @@ export function CouponCard({ coupon }: CouponCardProps) {
 
           {/* Desktop Offer Title */}
           <div className="mt-3.5 min-h-[2.5rem] flex items-start">
-            <h3 className="text-[15px] font-bold text-slate-900 group-hover:text-purple-700 transition-colors leading-snug tracking-tight line-clamp-2">
+            <h3 className="text-md font-bold text-slate-900 group-hover:text-purple-700 transition-colors leading-snug tracking-tight line-clamp-2">
               {coupon.title}
             </h3>
           </div>
@@ -185,7 +189,7 @@ export function CouponCard({ coupon }: CouponCardProps) {
         <button
           type="button"
           onClick={handleCopyAndShop}
-          className={`w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold text-[12px] min-[360px]:text-[13px] sm:text-sm transition-all shadow-sm active:scale-[0.98] ${
+          className={`w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold text-xs min-[360px]:text-xs sm:text-sm transition-all shadow-sm active:scale-[0.98] ${
             copied
               ? "bg-emerald-600 text-white shadow-emerald-600/20"
               : "bg-purple-700 hover:bg-purple-800 text-white shadow-purple-600/20 hover:shadow-md hover:shadow-purple-600/25"

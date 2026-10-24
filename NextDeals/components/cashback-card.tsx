@@ -127,8 +127,7 @@ function CashbackVoucherGraphic({ amount }: { amount: string }) {
             x="150"
             y="52"
             textAnchor="middle"
-            fontFamily="system-ui, -apple-system, sans-serif"
-            fontWeight="900"
+            style={{ fontFamily: "var(--font-sans)", fontWeight: "var(--weight-bold)" }}
             fontSize="12"
             fill="#047857"
             letterSpacing="0.5"
@@ -141,8 +140,7 @@ function CashbackVoucherGraphic({ amount }: { amount: string }) {
             x="150"
             y="114"
             textAnchor="middle"
-            fontFamily="system-ui, -apple-system, sans-serif"
-            fontWeight="900"
+            style={{ fontFamily: "var(--font-sans)", fontWeight: "var(--weight-black)" }}
             fontSize={fontSize}
             fill="#ffffff"
             letterSpacing="-1"
@@ -156,8 +154,7 @@ function CashbackVoucherGraphic({ amount }: { amount: string }) {
             x="150"
             y="143"
             textAnchor="middle"
-            fontFamily="system-ui, -apple-system, sans-serif"
-            fontWeight="900"
+            style={{ fontFamily: "var(--font-sans)", fontWeight: "var(--weight-extrabold)" }}
             fontSize="15"
             fill="#ffffff"
             letterSpacing="2.5"
@@ -190,8 +187,7 @@ function CashbackVoucherGraphic({ amount }: { amount: string }) {
               x="36"
               y="49"
               textAnchor="middle"
-              fontFamily="system-ui, -apple-system, sans-serif"
-              fontWeight="900"
+              style={{ fontFamily: "var(--font-sans)", fontWeight: "var(--weight-black)" }}
               fontSize="36"
               fill="#92400e"
             >
@@ -216,7 +212,10 @@ function CashbackVoucherGraphic({ amount }: { amount: string }) {
 export function CashbackCard({ offer }: CashbackCardProps) {
   const isCashbackEnabled = useCashbackVisibility()
   if (!isCashbackEnabled) return null
+  return <CashbackCardContent offer={offer} />
+}
 
+function CashbackCardContent({ offer }: CashbackCardProps) {
   const [logoError, setLogoError] = useState(false)
   const merchantName = offer.merchant || "Featured Partner"
   const merchantKey = merchantName.toLowerCase().replace(/[^a-z0-9-]/g, "")
@@ -264,10 +263,10 @@ export function CashbackCard({ offer }: CashbackCardProps) {
             />
           ) : (
             <div className="relative z-10 flex flex-col items-center justify-center text-white text-center">
-              <span className="text-2xl sm:text-3xl md:text-4xl font-black drop-shadow-md tracking-tight">
+              <span className="text-4xl font-black drop-shadow-md tracking-tight">
                 {merchantName.charAt(0)}
               </span>
-              <span className="text-xs font-black tracking-widest uppercase opacity-90 mt-0.5 line-clamp-1 max-w-[80px]">
+              <span className="text-xs font-bold tracking-widest uppercase opacity-90 mt-0.5 line-clamp-1 max-w-[80px]">
                 {merchantName}
               </span>
             </div>
@@ -278,7 +277,7 @@ export function CashbackCard({ offer }: CashbackCardProps) {
         <div className="flex-1 min-w-0 pr-1">
           {/* Top row: Merchant Name & Active Badge */}
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest truncate">
+            <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-widest truncate">
               {merchantName}
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 shrink-0">
@@ -288,10 +287,10 @@ export function CashbackCard({ offer }: CashbackCardProps) {
           </div>
 
           {/* Headline: Flat ₹50 / Cashback */}
-          <div className="text-xl sm:text-2xl md:text-3xl lg:text-[34px] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15]">
+          <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15]">
             <span>{prefix} </span>
-            <span className="text-purple-700 dark:text-purple-400 font-black">{amount}</span>
-            <span className="block font-black text-slate-900 dark:text-white">Cashback</span>
+            <span className="text-purple-700 dark:text-purple-400 font-bold">{amount}</span>
+            <span className="block font-bold text-slate-900 dark:text-white">Cashback</span>
           </div>
 
           {/* Condition text */}
@@ -348,7 +347,7 @@ export function CashbackCard({ offer }: CashbackCardProps) {
         href={`/out?url=${encodeURIComponent(offer.affiliateUrl)}&merchant=${encodeURIComponent(merchantKey)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative z-10 mt-4 flex items-center justify-center gap-2.5 w-full py-3.5 sm:py-4 px-6 rounded-2xl bg-purple-700 hover:bg-purple-800 active:scale-[0.99] text-white font-extrabold text-sm sm:text-base shadow-md hover:shadow-lg transition-all duration-200 group/btn"
+        className="relative z-10 mt-4 flex items-center justify-center gap-2.5 w-full py-3.5 sm:py-4 px-6 rounded-2xl bg-purple-700 hover:bg-purple-800 active:scale-[0.99] text-white font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all duration-200 group/btn"
       >
         <span>Activate Cashback</span>
         <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover/btn:translate-x-1.5 transition-transform duration-200" />

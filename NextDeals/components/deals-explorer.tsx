@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import Link from "next/link"
+import { useState, useMemo, useEffect } from "react"
+import Link from "@/components/localized-link"
 import { StoreOfferCard, OfferData } from "@/components/store-offer-card"
 import { useCountry } from "@/components/country-context"
 import { CountryFlag } from "@/components/country-flag"
@@ -25,6 +25,7 @@ export interface DealOfferItem extends OfferData {
 
 interface DealsExplorerProps {
   initialOffers: DealOfferItem[]
+  initialSearch?: string
   stores: Array<{
     name: string
     slug: string
@@ -50,17 +51,36 @@ const CATEGORIES = [
 
 const PAGE_SIZE = 16
 
-export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
+function matchesType(offer: DealOfferItem, type: DealTypeFilter): boolean {
+  if (type === "coupon") return Boolean(offer.code) && offer.type === "coupon"
+  if (type === "deal" || type === "cashback") return offer.type === type
+  return true
+}
+
+export function DealsExplorer({ initialOffers, stores, initialSearch = "" }: DealsExplorerProps) {
   const { country, setCountry } = useCountry()
   const isCashbackEnabled = useCashbackVisibility()
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState(initialSearch)
   const [selectedType, setSelectedType] = useState<DealTypeFilter>("all")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedStore, setSelectedStore] = useState("all")
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  // Filter offers
-  const filteredOffers = useMemo(() => {
+  // A new header search on the same page re-renders with a different ?q
+  useEffect(() => {
+    setSearch(initialSearch)
+    setVisibleCount(PAGE_SIZE)
+  }, [initialSearch])
+
+  // Region can also change from the header selector; a store from the old
+  // region would otherwise stay selected while hidden from the dropdown.
+  useEffect(() => {
+    setSelectedStore("all")
+    setVisibleCount(PAGE_SIZE)
+  }, [country.code])
+
+  // Every filter except the type tabs; the tab badges count from this list
+  const offersBeforeTypeFilter = useMemo(() => {
     return initialOffers.filter((offer) => {
       // 0. Country Filter
       if (country.code !== "GLOBAL") {
@@ -84,13 +104,6 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
         if (!matchTitle && !matchMerchant && !matchDesc && !matchCode) return false
       }
 
-      // 2. Type Filter (Coupon, Deal, Cashback)
-      if (selectedType !== "all") {
-        if (selectedType === "coupon" && (!offer.code || offer.type !== "coupon")) return false
-        if (selectedType === "deal" && offer.type !== "deal") return false
-        if (selectedType === "cashback" && offer.type !== "cashback") return false
-      }
-
       // 3. Category Filter
       if (selectedCategory !== "all" && offer.category !== selectedCategory) {
         return false
@@ -103,7 +116,12 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
 
       return true
     })
-  }, [initialOffers, country.code, search, selectedType, selectedCategory, selectedStore])
+  }, [initialOffers, country.code, search, selectedCategory, selectedStore, isCashbackEnabled])
+
+  const filteredOffers = useMemo(
+    () => offersBeforeTypeFilter.filter((offer) => matchesType(offer, selectedType)),
+    [offersBeforeTypeFilter, selectedType]
+  )
 
   const availableStores = useMemo(() => {
     if (country.code === "GLOBAL") return stores
@@ -113,9 +131,9 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
   const visibleOffers = filteredOffers.slice(0, visibleCount)
   const hasMore = visibleCount < filteredOffers.length
 
-  const couponsCount = filteredOffers.filter((o) => o.code || o.type === "coupon").length
-  const dealsCount = filteredOffers.filter((o) => o.type === "deal").length
-  const cashbackCount = filteredOffers.filter((o) => o.type === "cashback").length
+  const couponsCount = offersBeforeTypeFilter.filter((o) => matchesType(o, "coupon")).length
+  const dealsCount = offersBeforeTypeFilter.filter((o) => matchesType(o, "deal")).length
+  const cashbackCount = offersBeforeTypeFilter.filter((o) => matchesType(o, "cashback")).length
 
   const handleReset = () => {
     setSearch("")
@@ -130,7 +148,7 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
       {/* 1. Search Bar */}
       <div className="relative max-w-2xl mx-auto">
         <div className="relative flex items-center">
-          <Search className="absolute left-4 h-5 w-5 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-4 h-5 w-5 text-slate-500 pointer-events-none" />
           <input
             type="text"
             value={search}
@@ -145,7 +163,7 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3.5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="absolute right-3.5 p-1 rounded-full text-slate-500 hover:text-slate-600 hover:bg-slate-100"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -173,7 +191,7 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
             currentValue={selectedType}
             defaultValue="all"
             options={[
-              { value: "all", label: "All Offers", badge: initialOffers.length },
+              { value: "all", label: "All Offers", badge: offersBeforeTypeFilter.length },
               {
                 value: "coupon",
                 label: "Coupons & Codes",
@@ -269,7 +287,7 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
               <button
                 type="button"
                 onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-purple-300 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-bold text-xs shadow-sm transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-purple-300 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-bold text-sm shadow-sm transition-all"
               >
                 <span>Load More Deals ({filteredOffers.length - visibleCount} remaining)</span>
                 <ChevronRight className="h-4 w-4" />
@@ -289,7 +307,7 @@ export function DealsExplorer({ initialOffers, stores }: DealsExplorerProps) {
           <button
             type="button"
             onClick={handleReset}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-sm transition-all"
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-sm transition-all"
           >
             <span>Reset All Filters</span>
           </button>

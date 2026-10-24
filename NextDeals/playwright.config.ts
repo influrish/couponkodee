@@ -6,6 +6,10 @@ import { defineConfig, devices } from '@playwright/test'
  */
 import 'dotenv/config'
 
+// Dedicated port so tests never hit another app already running on :3000
+const PORT = Number(process.env.E2E_PORT || 3100)
+const BASE_URL = `http://localhost:${PORT}`
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -18,11 +22,11 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: process.env.CI ? 'html' : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
+    baseURL: BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -34,8 +38,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
-    reuseExistingServer: true,
-    url: 'http://localhost:3000',
+    command: `npm run dev -- -p ${PORT}`,
+    reuseExistingServer: !process.env.CI,
+    url: BASE_URL,
+    timeout: 180_000,
   },
 })

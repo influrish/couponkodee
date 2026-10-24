@@ -1,25 +1,20 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { getStoreOffers } from "@/lib/stores-data"
 import { getDbStores } from "@/lib/db-stores"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { DealsExplorer, DealOfferItem } from "@/components/deals-explorer"
-import { getBrandLogo } from "@/lib/brand-logos"
-import { StoreLogoImage } from "@/components/store-logo-image"
 import {
-  BadgeCheck,
-  CheckCircle2,
   ChevronRight,
   CircleDollarSign,
-  HelpCircle,
   Flame,
   Scissors,
   ShieldCheck,
-  Sparkles,
-  Tag,
-  Zap,
 } from "lucide-react"
+import { mergeOffers, relationSlug, slugifyMerchant } from "@/lib/offer-merge"
+import { getOfferCount } from "@/lib/offer-count"
+import { StoreTile } from "@/components/store-tile"
 
 export const metadata: Metadata = {
   title: "Best Trending Deals, Sales & Price Drops | CouponKodee",
@@ -30,7 +25,13 @@ export const metadata: Metadata = {
 // ISR revalidation
 export const revalidate = 60
 
-export default async function DealsPage() {
+export default async function DealsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>
+}) {
+  const { q } = await searchParams
+  const initialSearch = (Array.isArray(q) ? q[0] : q)?.slice(0, 100) || ""
   const isCashbackEnabled = await getCashbackVisibility()
   const stores = await getDbStores(isCashbackEnabled)
 
@@ -70,7 +71,7 @@ export default async function DealsPage() {
       title: p.title,
       description: p.shortDescription,
       merchant: p.merchant || "Featured Store",
-      merchantSlug: (p.merchant || "").toLowerCase().replace(/[^a-z0-9]/g, "-"),
+      merchantSlug: relationSlug(p.store) || slugifyMerchant(p.merchant),
       discount: p.pricing?.discountPercentage ? `${p.pricing.discountPercentage}% OFF` : "Deal",
       type: "deal" as const,
       affiliateUrl: p.affiliateUrl || "https://google.com",
@@ -78,31 +79,12 @@ export default async function DealsPage() {
       category: typeof p.category === "object" ? p.category?.slug : p.category || "electronics",
       countries: Array.isArray(p.countries) && p.countries.length > 0 ? p.countries : ["IN"],
     }))
-  } catch {
-    // fallback to static offers
+  } catch (err) {
+    console.warn("Unable to load products from CMS, showing store data only:", err)
   }
 
-  // Combine and deduplicate
-  const seenDeals = new Set<string>()
-  const allOffers: DealOfferItem[] = []
-
-  for (const d of dbOffers) {
-    const merchantKey = String(d.merchantSlug || d.merchant || "").toLowerCase()
-    const titleKey = String(d.title || "").toLowerCase()
-    const key = `${merchantKey}::${titleKey}`
-    seenDeals.add(key)
-    allOffers.push(d)
-  }
-
-  for (const d of staticOffers) {
-    const merchantKey = String(d.merchantSlug || d.merchant || "").toLowerCase()
-    const titleKey = String(d.title || "").toLowerCase()
-    const key = `${merchantKey}::${titleKey}`
-    if (!seenDeals.has(key)) {
-      seenDeals.add(key)
-      allOffers.push(d)
-    }
-  }
+  // Combine and deduplicate: DB deals take priority
+  const allOffers = mergeOffers([dbOffers, staticOffers], (d) => String(d.title || ""))
 
   // Extract popular stores for the top strip
   const popularStores = stores.filter((s) => s.isPopular).slice(0, 8)
@@ -110,28 +92,25 @@ export default async function DealsPage() {
   return (
     <div className="min-h-screen bg-slate-50/60 pb-16">
       {/* Breadcrumb Navigation */}
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Deals", href: "/deals" },
-            ]}
-          />
-        </div>
-      </div>
+      <Breadcrumb
+        variant="bar"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Deals", href: "/deals" },
+        ]}
+      />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container py-8">
         {/* Page Header */}
         <section className="text-center max-w-3xl mx-auto mb-8">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-xs font-black uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-xs font-bold uppercase tracking-wider mb-3">
             <Flame className="h-3.5 w-3.5" />
             Top Price Drops &amp; Offers
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Trending Deals &amp; Daily Price Drops
           </h1>
-          <p className="mt-2 text-[15.5px] text-slate-700 leading-relaxed">
+          <p className="mt-2 text-md text-slate-700 leading-relaxed">
             The biggest discounts and clearance deals across top retailers. No promo codes required — just click &ldquo;Get Deal&rdquo; for instant price reductions.
           </p>
         </section>
@@ -152,76 +131,22 @@ export default async function DealsPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
-            {popularStores.map((store) => {
-              const logo = store.logoUrl || getBrandLogo(store.slug) || getBrandLogo(store.name)
-              return (
-                <Link
-                  key={store.slug}
-                  href={`/store/${store.slug}`}
-                  className="group flex flex-col items-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-purple-300 hover:shadow-sm transition-all text-center justify-between"
-                >
-                  {/* MOBILE LAYOUT (< 640px) */}
-                  <div className="sm:hidden flex flex-col items-center justify-between text-center w-full gap-2 py-1">
-                    {/* Top: Full brand name with verified badge */}
-                    <div className="flex items-center justify-center gap-1.5 w-full">
-                      <span className="font-extrabold text-[15px] text-slate-900 group-hover:text-purple-700 transition-colors text-center leading-snug break-words">
-                        {store.name}
-                      </span>
-                      <BadgeCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                    </div>
-
-                    {/* Below: Brand logo */}
-                    <div className="h-[52px] w-[52px] rounded-xl overflow-hidden shadow-2xs flex items-center justify-center my-0.5 bg-white border border-slate-200/80 p-1">
-                      <StoreLogoImage
-                        src={logo}
-                        alt={store.name}
-                        initial={store.initial}
-                        bg={store.bg}
-                        size="md"
-                      />
-                    </div>
-
-                    {/* Below the logo: Offers count, such as "2 Offers" */}
-                    <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
-                      2 Offers
-                    </span>
-                  </div>
-
-                  {/* DESKTOP / TABLET LAYOUT (>= 640px) UNCHANGED */}
-                  <div className="hidden sm:flex flex-col items-center w-full">
-                    <StoreLogoImage
-                      src={logo}
-                      alt={store.name}
-                      initial={store.initial}
-                      bg={store.bg}
-                      size="md"
-                      className="mb-2 group-hover:scale-105 transition-transform"
-                    />
-                    <span className="text-xs font-bold text-slate-900 group-hover:text-purple-700 truncate w-full">
-                      {store.name}
-                    </span>
-                    <span className="text-xs font-semibold text-slate-500 mt-0.5">
-                      {(() => {
-                        const count = store.offers ? store.offers.length : (store.couponsCount ?? 0)
-                        return `${count} ${count === 1 ? "offer" : "offers"}`
-                      })()}
-                    </span>
-                  </div>
-                </Link>
-              )
-            })}
+            {popularStores.map((store) => (
+              <StoreTile key={store.slug} store={store} />
+            ))}
           </div>
         </section>
 
         {/* Interactive Deals & Coupons Explorer */}
         <DealsExplorer
+          initialSearch={initialSearch}
           initialOffers={isCashbackEnabled ? allOffers : allOffers.filter((o) => o.type !== "cashback")}
           stores={stores.map((s) => ({
             name: s.name,
             slug: s.slug,
             initial: s.initial,
             bg: s.bg,
-            offersCount: s.offers ? s.offers.length : (s.couponsCount ?? 0),
+            offersCount: getOfferCount(s),
             countries: s.countries,
           }))}
         />
@@ -229,10 +154,10 @@ export default async function DealsPage() {
         {/* SEO & Redemption Guide */}
         <section className="mt-16 pt-10 border-t border-slate-200">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-sm max-w-4xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-3">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">
               How to Save with CouponKodee Deals &amp; Promo Codes
             </h2>
-            <p className="text-sm sm:text-[15px] text-slate-700 leading-relaxed mb-6">
+            <p className="text-sm sm:text-md text-slate-700 leading-relaxed mb-6">
               Online shopping is always cheaper when you know where to look. At CouponKodee, our automated systems and deal curation team scan over 500 partner retailers 24 hours a day to test and verify every promo code.
             </p>
 

@@ -1,11 +1,12 @@
 import type { GlobalConfig } from "payload"
+import { anyone, isStaff } from "../access/roles"
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
   label: "Site Settings & Visibility",
   access: {
-    read: () => true,
-    update: ({ req: { user } }) => Boolean(user),
+    read: anyone,
+    update: isStaff,
   },
   fields: [
     {

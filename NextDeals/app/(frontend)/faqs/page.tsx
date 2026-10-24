@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "@/components/localized-link"
 import { Breadcrumb } from "@/components/breadcrumb"
 
 export const metadata: Metadata = {
@@ -35,8 +36,9 @@ const faqs = [
 
 export default function FAQsPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container py-8 max-w-4xl">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: "FAQs", href: "/faqs" },
@@ -45,7 +47,7 @@ export default function FAQsPage() {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Frequently Asked Questions</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Frequently Asked Questions</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
             Everything you need to know about using coupons, claiming deals, and shopping smarter with CouponKodee.
           </p>
@@ -63,14 +65,14 @@ export default function FAQsPage() {
         <div className="border rounded-xl p-6 bg-muted/40 text-center space-y-3">
           <h3 className="font-semibold text-lg">Still have questions?</h3>
           <p className="text-sm text-muted-foreground">
-            Can't find the answer you're looking for? Reach out to our friendly support team.
+            Can&apos;t find the answer you&apos;re looking for? Reach out to our friendly support team.
           </p>
-          <a
+          <Link
             href="/contact"
             className="inline-block px-5 py-2 bg-primary text-primary-foreground font-medium text-sm rounded-md hover:bg-primary/90 transition-colors"
           >
             Contact Support
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import {
   ArrowRight,
@@ -37,6 +37,13 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
   const [copied, setCopied] = useState(false)
   const [logoError, setLogoError] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     setMounted(true)
@@ -79,10 +86,11 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
 
   const handleCopy = () => {
     if (coupon.code && navigator.clipboard) {
-      navigator.clipboard.writeText(coupon.code)
+      navigator.clipboard.writeText(coupon.code).catch(() => {})
     }
     setCopied(true)
-    setTimeout(() => setCopied(false), 4000)
+    if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current)
+    copyResetTimerRef.current = setTimeout(() => setCopied(false), 4000)
   }
 
   const modalContent = (
@@ -127,14 +135,14 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
                 />
               </span>
             ) : (
-              <span className="h-12 w-12 rounded-2xl bg-white text-purple-800 font-black text-lg flex items-center justify-center shadow-md shrink-0">
+              <span className="h-12 w-12 rounded-2xl bg-white text-purple-800 font-extrabold text-lg flex items-center justify-center shadow-md shrink-0">
                 {coupon.merchant.charAt(0).toUpperCase()}
               </span>
             )}
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-xs font-black uppercase tracking-wider text-purple-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-200">
                   {coupon.merchant}
                 </span>
                 {coupon.isVerified !== false && (
@@ -144,7 +152,7 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
                   </span>
                 )}
                 {coupon.discount && (
-                  <span className="inline-flex items-center gap-1 text-xs font-black bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-xs">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-xs">
                     <Tag className="h-3.5 w-3.5" />
                     {coupon.discount}
                   </span>
@@ -153,7 +161,7 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
 
               <h2
                 id="coupon-modal-title"
-                className="text-lg sm:text-xl font-black text-white leading-snug"
+                className="text-lg sm:text-xl font-extrabold text-white leading-snug"
               >
                 {coupon.title}
               </h2>
@@ -166,13 +174,13 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
           {hasCode ? (
             /* Highlighted Coupon Box */
             <div className="rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50/90 to-indigo-50/60 p-4 sm:p-5 relative overflow-hidden text-center shadow-xs">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-purple-700 mb-2">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider text-purple-700 mb-2">
                 <Scissors className="h-3.5 w-3.5 rotate-[-45deg]" />
                 <span>Copy and paste this code at checkout</span>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white border border-purple-200 rounded-xl p-2.5 sm:pl-5 shadow-xs">
-                <span className="font-mono text-xl sm:text-2xl font-black text-purple-950 tracking-widest select-all">
+                <span className="font-mono text-2xl font-extrabold text-purple-950 tracking-widest select-all">
                   {coupon.code}
                 </span>
 
@@ -210,7 +218,7 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
           ) : (
             /* Direct Deal Box */
             <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/90 to-teal-50/60 p-4 sm:p-5 relative overflow-hidden text-center shadow-xs">
-              <div className="flex items-center justify-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-emerald-700 mb-1">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
                 <Zap className="h-3.5 w-3.5" />
                 <span>Direct Deal • No Promo Code Needed</span>
               </div>
@@ -274,7 +282,7 @@ export function CouponModal({ isOpen, onClose, coupon }: CouponModalProps) {
               href={redirectUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-purple-700 hover:bg-purple-800 active:scale-[0.99] text-white font-extrabold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-purple-700 hover:bg-purple-800 active:scale-[0.99] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
               <span>Continue to {coupon.merchant}</span>
               <ExternalLink className="h-4 w-4" />

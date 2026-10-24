@@ -17,8 +17,9 @@ export default async function AboutPage() {
     "Welcome to CouponKodee — your trusted destination for genuine online discounts, verified promo codes, and hand-curated shopping deals across leading brands and stores."
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container py-8 max-w-4xl">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: "About Us", href: "/about" },
@@ -27,7 +28,7 @@ export default async function AboutPage() {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">{title}</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
             {subtitle}
           </p>
@@ -85,7 +86,7 @@ export default async function AboutPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold">Our Mission</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Our mission is simple: to make every shopping rupee stretch further. We believe savvy shopping shouldn't involve jumping through hurdles or wasting time on invalid voucher codes. We combine automated deal tracking with human curation to deliver an honest, transparent savings experience.
+            Our mission is simple: to make every shopping rupee stretch further. We believe savvy shopping shouldn&apos;t involve jumping through hurdles or wasting time on invalid voucher codes. We combine automated deal tracking with human curation to deliver an honest, transparent savings experience.
           </p>
         </section>
 

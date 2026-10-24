@@ -28,51 +28,87 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 const STORAGE_KEY = "couponkodee_user"
+// Display-only until a wallet ledger exists on the backend.
+const WELCOME_BONUS = 50.0
+
+function toAuthUser(raw: any): AuthUser {
+  return {
+    id: String(raw.id),
+    name: raw.name || "Member",
+    email: raw.email,
+    role: raw.role || "user",
+    walletBalance: WELCOME_BONUS,
+  }
+}
+
+async function readJson(res: Response): Promise<any> {
+  try {
+    return await res.json()
+  } catch {
+    return {} // non-JSON body, e.g. an HTML error page when the server is down
+  }
+}
+
+function readStoredUser(): AuthUser | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored ? (JSON.parse(stored) as AuthUser) : null
+  } catch {
+    return null
+  }
+}
+
+function writeStoredUser(user: AuthUser | null) {
+  try {
+    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
+    else localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // storage unavailable (private mode / quota); in-memory state still works
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  // 1. Initial hydration from localStorage and background verification with /api/users/me
+  // 1. Initial hydration from localStorage, then verify the session cookie with /api/users/me
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        setUser(JSON.parse(stored))
-      }
-    } catch {
-      // ignore JSON parse errors
-    }
+    let cancelled = false
+    setUser(readStoredUser())
 
-    // Verify session with server
-    fetch("/api/users/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.user) {
-          const verifiedUser: AuthUser = {
-            id: String(data.user.id),
-            name: data.user.name || "Member",
-            email: data.user.email,
-            role: data.user.role || "user",
-            walletBalance: 50.0, // Initial welcome bonus
-          }
-          setUser(verifiedUser)
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(verifiedUser))
-        } else {
-          // If server reports no session, check if we had demo / local stored user
-          // Keep local state if user signed in during this session
-        }
+    fetch("/api/users/me", { credentials: "same-origin" })
+      .then(async (res) => {
+        if (!res.ok) return // server/DB unavailable: keep the cached user until we know better
+        const data = await res.json()
+        if (cancelled) return
+        // The server is authoritative: no user means the cookie expired or was cleared.
+        const verifiedUser = data.user ? toAuthUser(data.user) : null
+        setUser(verifiedUser)
+        writeStoredUser(verifiedUser)
       })
       .catch(() => {
-        // Offline / network fallback
+        // Offline: keep cached state
       })
       .finally(() => {
-        setIsLoading(false)
+        if (!cancelled) setIsLoading(false)
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  // 2. Sign In
+  // 2. Keep tabs in sync when the user logs in or out elsewhere
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === STORAGE_KEY || event.key === null) setUser(readStoredUser())
+    }
+    window.addEventListener("storage", handleStorage)
+    return () => window.removeEventListener("storage", handleStorage)
+  }, [])
+
+  // 3. Sign In
   const login = useCallback(async (email: string, password: string) => {
     try {
       const res = await fetch("/api/users/login", {
@@ -81,24 +117,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email: email.trim(), password }),
       })
 
-      const data = await res.json()
+      const data = await readJson(res)
 
       if (!res.ok || !data.user) {
         const errorMsg =
-          data.errors?.[0]?.message || data.message || "Invalid email or password. Please try again."
+          data.errors?.[0]?.message ||
+          data.message ||
+          (res.status >= 500 ? "Sign-in is temporarily unavailable. Please try again shortly." : "Invalid email or password. Please try again.")
         return { success: false, error: errorMsg }
       }
 
-      const loggedInUser: AuthUser = {
-        id: String(data.user.id),
-        name: data.user.name || "Member",
-        email: data.user.email,
-        role: data.user.role || "user",
-        walletBalance: 50.0,
-      }
-
+      const loggedInUser = toAuthUser(data.user)
       setUser(loggedInUser)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(loggedInUser))
+      writeStoredUser(loggedInUser)
       return { success: true }
     } catch (err: any) {
       return {
@@ -108,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // 3. Join Free (Sign Up)
+  // 4. Join Free (Sign Up)
   const signup = useCallback(async (name: string, email: string, password: string) => {
     try {
       const res = await fetch("/api/auth/register", {
@@ -117,22 +148,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
       })
 
-      const data = await res.json()
+      const data = await readJson(res)
 
       if (!res.ok || !data.user) {
         return { success: false, error: data.error || "Failed to create account. Please try again." }
       }
 
-      const newUser: AuthUser = {
-        id: String(data.user.id),
-        name: data.user.name,
-        email: data.user.email,
-        role: data.user.role || "user",
-        walletBalance: 50.0,
-      }
-
+      const newUser = toAuthUser(data.user)
       setUser(newUser)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser))
+      writeStoredUser(newUser)
       return { success: true }
     } catch (err: any) {
       return {
@@ -142,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // 4. Log Out
+  // 5. Log Out
   const logout = useCallback(async () => {
     try {
       await fetch("/api/users/logout", { method: "POST" })
@@ -150,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // ignore network errors on logout
     }
     setUser(null)
-    localStorage.removeItem(STORAGE_KEY)
+    writeStoredUser(null)
     router.refresh()
   }, [router])
 

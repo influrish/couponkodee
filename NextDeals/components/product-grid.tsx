@@ -85,7 +85,8 @@ export function ProductGrid({ products }: ProductGridProps) {
             </Button>
           </CardContent>
         </Card>
-      ))}
+        )
+      })}
     </div>
   )
 }

@@ -1,11 +1,12 @@
 import type { GlobalConfig } from "payload"
+import { anyone, isStaff } from "../access/roles"
 
 export const Header: GlobalConfig = {
   slug: "header",
   label: "Header & Navigation",
   access: {
-    read: () => true,
-    update: ({ req: { user } }) => Boolean(user),
+    read: anyone,
+    update: isStaff,
   },
   fields: [
     {

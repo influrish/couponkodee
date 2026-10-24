@@ -1,9 +1,13 @@
 "use client"
 
-import { useState, Suspense } from "react"
-import Link from "next/link"
+import { useState, useEffect, useRef, Suspense } from "react"
+import Link from "@/components/localized-link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
+import { BrandLogo } from "@/components/brand-logo"
+import { safeRedirectPath } from "@/lib/safe-redirect"
+import { localizeHref } from "@/lib/regions"
+import { useCountry } from "@/components/country-context"
 import { useCashbackVisibility } from "@/components/cashback-context"
 import {
   ArrowRight,
@@ -26,7 +30,8 @@ import {
 function SignUpForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectUrl = searchParams.get("redirect") || "/"
+  const { region } = useCountry()
+  const redirectUrl = localizeHref(safeRedirectPath(searchParams.get("redirect")), region)
   const isCashbackEnabled = useCashbackVisibility()
 
   const { signup, user } = useAuth()
@@ -40,9 +45,20 @@ function SignUpForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
-  // If already logged in, redirect
-  if (user && !isSuccess) {
-    router.replace(redirectUrl)
+  const successRedirectRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // If already logged in, redirect (in an effect: navigating during render is not allowed)
+  useEffect(() => {
+    if (user && !isSuccess && !isSubmitting) router.replace(redirectUrl)
+  }, [user, isSuccess, isSubmitting, redirectUrl, router])
+
+  useEffect(() => {
+    return () => {
+      if (successRedirectRef.current) clearTimeout(successRedirectRef.current)
+    }
+  }, [])
+
+  if (user && !isSuccess && !isSubmitting) {
     return null
   }
 
@@ -76,7 +92,7 @@ function SignUpForm() {
 
     if (result.success) {
       setIsSuccess(true)
-      setTimeout(() => {
+      successRedirectRef.current = setTimeout(() => {
         router.push(redirectUrl)
       }, 1500)
     } else {
@@ -94,29 +110,22 @@ function SignUpForm() {
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10">
-            <Link href="/" className="inline-flex items-center gap-2 mb-8 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 font-black text-white text-lg shadow-md group-hover:scale-105 transition-transform">
-                CK
-              </div>
-              <span className="text-xl font-black tracking-tight text-white">
-                Coupon<span className="text-purple-400">Kodee</span>
-              </span>
-            </Link>
+            <BrandLogo tone="light" size="lg" className="mb-8" />
 
             {/* Welcome Bonus / Member Badge Banner */}
             {isCashbackEnabled ? (
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black mb-4">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold mb-4">
                 <Gift className="h-4 w-4 text-emerald-400" />
                 ₹50 Free Welcome Bonus
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 text-xs font-black mb-4">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-300 text-xs font-bold mb-4">
                 <Sparkles className="h-4 w-4 text-purple-400" />
                 100% Free Member Access
               </div>
             )}
 
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+            <h2 className="text-3xl font-black text-white tracking-tight leading-tight">
               {isCashbackEnabled
                 ? "Start earning real money while shopping."
                 : "Start saving money on every single order."}
@@ -177,7 +186,7 @@ function SignUpForm() {
                 <Sparkles className="h-3 w-3 text-emerald-600" />
                 Claim ₹50 Welcome Bonus
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">
                 Create your free account
               </h1>
               <p className="mt-1 text-sm text-slate-600">
@@ -191,7 +200,7 @@ function SignUpForm() {
                 <div className="h-12 w-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-black text-emerald-900">Account Created Successfully!</h3>
+                <h3 className="text-lg font-extrabold text-emerald-900">Account Created Successfully!</h3>
                 <p className="text-xs font-semibold text-emerald-800">
                   Your ₹50 Welcome Bonus has been credited to your wallet. Redirecting you to the best deals...
                 </p>
@@ -212,7 +221,7 @@ function SignUpForm() {
                       Full Name
                     </label>
                     <div className="relative flex items-center">
-                      <User className="absolute left-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                      <User className="absolute left-3.5 h-4 w-4 text-slate-500 pointer-events-none" />
                       <input
                         type="text"
                         required
@@ -229,7 +238,7 @@ function SignUpForm() {
                       Email Address
                     </label>
                     <div className="relative flex items-center">
-                      <Mail className="absolute left-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                      <Mail className="absolute left-3.5 h-4 w-4 text-slate-500 pointer-events-none" />
                       <input
                         type="email"
                         required
@@ -246,7 +255,7 @@ function SignUpForm() {
                       Password (min. 6 characters)
                     </label>
                     <div className="relative flex items-center">
-                      <Lock className="absolute left-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                      <Lock className="absolute left-3.5 h-4 w-4 text-slate-500 pointer-events-none" />
                       <input
                         type={showPassword ? "text" : "password"}
                         required
@@ -258,7 +267,7 @@ function SignUpForm() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="absolute right-3 p-1 text-slate-500 hover:text-slate-600 transition-colors"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

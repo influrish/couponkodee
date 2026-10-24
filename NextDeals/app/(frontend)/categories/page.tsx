@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import {
   getStoresByCategory,
   getStoreOffers,
@@ -112,28 +112,25 @@ export default async function CategoriesPage() {
   return (
     <div className="min-h-screen bg-slate-50/60 pb-16">
       {/* Breadcrumb Navigation */}
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Categories", href: "/categories" },
-            ]}
-          />
-        </div>
-      </div>
+      <Breadcrumb
+        variant="bar"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Categories", href: "/categories" },
+        ]}
+      />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container py-8">
         {/* Header */}
         <section className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 text-purple-800 px-3 py-1 text-xs font-black uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 text-purple-800 px-3 py-1 text-xs font-bold uppercase tracking-wider mb-3">
             <Sparkles className="h-3.5 w-3.5" />
             Explore by Department
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Browse All Shopping Categories
           </h1>
-          <p className="mt-2 text-[15.5px] text-slate-700 leading-relaxed">
+          <p className="mt-2 text-md text-slate-700 leading-relaxed">
             {isCashbackEnabled
               ? "Find the best verified coupons, exclusive promo codes, and highest cashback rates organized by your favorite shopping interests."
               : "Find the best verified coupons and exclusive promo codes organized by your favorite shopping interests."}
@@ -170,7 +167,7 @@ export default async function CategoriesPage() {
                       </span>
                     </div>
 
-                    <h2 className="text-lg font-black text-slate-900 group-hover:text-purple-700 transition-colors">
+                    <h2 className="text-lg font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors">
                       {cat.name}
                     </h2>
                     <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
@@ -219,7 +216,7 @@ export default async function CategoriesPage() {
                         Department
                       </span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                    <h2 className="text-2xl font-extrabold text-slate-900">
                       {cat.name}
                     </h2>
                   </div>
@@ -256,7 +253,7 @@ export default async function CategoriesPage() {
                           />
                           <span>{store.name}</span>
                           {isCashbackEnabled && store.cashbackRate && (
-                            <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
                               Cashback
                             </span>
                           )}

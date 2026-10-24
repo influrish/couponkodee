@@ -1,11 +1,12 @@
 import type { GlobalConfig } from "payload"
+import { anyone, isStaff } from "../access/roles"
 
 export const Footer: GlobalConfig = {
   slug: "footer",
   label: "Footer & Legal",
   access: {
-    read: () => true,
-    update: ({ req: { user } }) => Boolean(user),
+    read: anyone,
+    update: isStaff,
   },
   fields: [
     {
@@ -37,6 +38,13 @@ export const Footer: GlobalConfig = {
           name: "tagline",
           type: "text",
           defaultValue: "The Smart Savings & Cashback Hub",
+        },
+        {
+          name: "customLogoUrl",
+          type: "text",
+          admin: {
+            description: "Optional URL for custom image logo (overrides text logo if provided)",
+          },
         },
         {
           name: "bio",

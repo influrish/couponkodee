@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { HelpCircle, Search, ShoppingBag, AlertCircle } from "lucide-react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 
 export const metadata: Metadata = {
   title: "Help Center | CouponKodee",
@@ -10,8 +10,9 @@ export const metadata: Metadata = {
 
 export default function HelpPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container py-8 max-w-4xl">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: "Help Center", href: "/help" },
@@ -20,7 +21,7 @@ export default function HelpPage() {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Help Center</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Help Center</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
             Need guidance navigating deals or redeeming coupons? Explore our help topics and quick answers below.
           </p>
@@ -53,7 +54,7 @@ export default function HelpPage() {
             </div>
             <h3 className="text-lg font-semibold">Troubleshooting Promo Codes</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              If a promo code doesn't apply, check the code's terms for minimum cart values, eligible categories, or user limits (e.g. valid only for first-time shoppers).
+              If a promo code doesn&apos;t apply, check the code&apos;s terms for minimum cart values, eligible categories, or user limits (e.g. valid only for first-time shoppers).
             </p>
           </div>
 

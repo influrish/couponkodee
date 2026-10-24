@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload"
+import { publicContentAccess } from "../access/roles"
 
 export const CouponOffers: CollectionConfig = {
   slug: "coupon-offers",
@@ -7,12 +8,7 @@ export const CouponOffers: CollectionConfig = {
     defaultColumns: ["title", "merchant", "code", "discount", "isFeatured", "isVerified", "isActive", "updatedAt"],
     listSearchableFields: ["title", "description", "merchant", "code"],
   },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
-  },
+  access: publicContentAccess,
   fields: [
     {
       name: "title",

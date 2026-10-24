@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 export const dynamic = "force-dynamic"
 
 export async function POST(req: NextRequest) {
+  const limit = checkRateLimit(`register:${getClientIp(req)}`, 5, 10 * 60_000)
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: "Too many sign-up attempts. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    )
+  }
+
   try {
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { name, email, password } = body
 
     if (!name || typeof name !== "string" || name.trim().length < 2) {
@@ -20,9 +29,9 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (!password || typeof password !== "string" || password.length < 6) {
+    if (!password || typeof password !== "string" || password.length < 6 || password.length > 128) {
       return NextResponse.json(
-        { error: "Password must be at least 6 characters long." },
+        { error: "Password must be between 6 and 128 characters long." },
         { status: 400 }
       )
     }
@@ -43,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (existing.docs.length > 0) {
       return NextResponse.json(
         { error: "An account with this email address already exists. Please sign in instead." },
-        { status: 400 }
+        { status: 409 }
       )
     }
 
@@ -96,10 +105,10 @@ export async function POST(req: NextRequest) {
     }
 
     return response
-  } catch (error: any) {
+  } catch (error) {
     console.error("Registration error:", error)
     return NextResponse.json(
-      { error: error?.message || "Failed to create account. Please try again." },
+      { error: "Failed to create account. Please try again." },
       { status: 500 }
     )
   }

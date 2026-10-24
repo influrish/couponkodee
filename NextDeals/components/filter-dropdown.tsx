@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react"
 import { Check, ChevronDown, Search } from "lucide-react"
 import { CountryFlag } from "@/components/country-flag"
-import { COUNTRIES, Country } from "@/lib/countries-data"
+import { COUNTRIES, type CountryInfo } from "@/lib/countries-data"
 
 export interface FilterDropdownOption {
   value: string
@@ -85,13 +85,13 @@ export function FilterDropdown({
         }`}
         aria-expanded={isOpen}
       >
-        {prefix && <span className="text-slate-400 font-semibold">{prefix}</span>}
+        {prefix && <span className="text-slate-500 font-semibold">{prefix}</span>}
         {selectedOption?.icon && <span className="shrink-0">{selectedOption.icon}</span>}
         <span className="truncate max-w-[130px] sm:max-w-[180px]">
           {selectedOption ? selectedOption.label : label || currentValue}
         </span>
         <ChevronDown
-          className={`h-3.5 w-3.5 text-slate-400 group-hover:text-purple-600 transition-transform shrink-0 ${
+          className={`h-3.5 w-3.5 text-slate-500 group-hover:text-purple-600 transition-transform shrink-0 ${
             isOpen ? "rotate-180 text-purple-600" : ""
           }`}
         />
@@ -106,7 +106,7 @@ export function FilterDropdown({
         >
           {searchable && (
             <div className="relative mb-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500 pointer-events-none" />
               <input
                 type="text"
                 value={search}
@@ -160,7 +160,7 @@ export function FilterDropdown({
                     }}
                     className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-purple-50 border border-purple-200/90 text-purple-950 font-black shadow-xs"
+                        ? "bg-purple-50 border border-purple-200/90 text-purple-950 font-bold shadow-xs"
                         : "hover:bg-slate-50 text-slate-700"
                     }`}
                   >
@@ -170,7 +170,7 @@ export function FilterDropdown({
                         {opt.label}
                       </span>
                       {opt.badge !== undefined && (
-                        <span className="inline-flex px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px] font-bold text-slate-600">
+                        <span className="inline-flex px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-2xs font-bold text-slate-600">
                           {opt.badge}
                         </span>
                       )}
@@ -185,7 +185,7 @@ export function FilterDropdown({
               })}
 
               {filteredOptions.length === 0 && (
-                <div className="p-3 text-center text-xs text-slate-400">
+                <div className="p-3 text-center text-xs text-slate-500">
                   No matching options
                 </div>
               )}
@@ -206,8 +206,8 @@ export function RegionFilterDropdown({
   onSelectCountry,
   className = "",
 }: {
-  country: Country
-  onSelectCountry: (c: Country) => void
+  country: CountryInfo
+  onSelectCountry: (c: CountryInfo) => void
   className?: string
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -237,14 +237,14 @@ export function RegionFilterDropdown({
         }`}
         aria-expanded={isOpen}
       >
-        <span className="text-slate-400 font-semibold">Region:</span>
+        <span className="text-slate-500 font-semibold">Region:</span>
         <CountryFlag code={country.code} size="sm" />
         <span className="truncate max-w-[130px] sm:max-w-[180px]">{country.name}</span>
-        <span className="px-1.5 py-0.5 rounded bg-purple-100 text-[10px] font-black text-purple-800 uppercase">
+        <span className="px-1.5 py-0.5 rounded bg-purple-100 text-2xs font-bold text-purple-800 uppercase">
           {country.code}
         </span>
         <ChevronDown
-          className={`h-3.5 w-3.5 text-slate-400 group-hover:text-purple-600 transition-transform shrink-0 ${
+          className={`h-3.5 w-3.5 text-slate-500 group-hover:text-purple-600 transition-transform shrink-0 ${
             isOpen ? "rotate-180 text-purple-600" : ""
           }`}
         />
@@ -265,7 +265,7 @@ export function RegionFilterDropdown({
                   }}
                   className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all cursor-pointer ${
                     isSelected
-                      ? "bg-purple-50 border border-purple-200/90 text-purple-950 font-black shadow-xs"
+                      ? "bg-purple-50 border border-purple-200/90 text-purple-950 font-bold shadow-xs"
                       : "hover:bg-slate-50 text-slate-700"
                   }`}
                 >
@@ -274,7 +274,7 @@ export function RegionFilterDropdown({
                     <span className="text-xs font-bold text-slate-900 truncate">
                       {c.name}
                     </span>
-                    <span className="inline-flex px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-xs font-black text-slate-700 uppercase">
+                    <span className="inline-flex px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 uppercase">
                       {c.code}
                     </span>
                   </div>

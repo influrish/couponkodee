@@ -1,22 +1,19 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { getStoreOffers } from "@/lib/stores-data"
 import { getDbStores } from "@/lib/db-stores"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CouponsExplorer, CouponItem } from "@/components/coupons-explorer"
-import { getBrandLogo } from "@/lib/brand-logos"
-import { StoreLogoImage } from "@/components/store-logo-image"
 import {
-  BadgeCheck,
   ChevronRight,
-  HelpCircle,
   Scissors,
   ShieldCheck,
-  Sparkles,
-  Tag,
   Zap,
 } from "lucide-react"
+import { mergeOffers, relationSlug, slugifyMerchant } from "@/lib/offer-merge"
+import { getOfferCount } from "@/lib/offer-count"
+import { StoreTile } from "@/components/store-tile"
 
 export const metadata: Metadata = {
   title: "Verified Coupons & Promo Codes | CouponKodee",
@@ -69,7 +66,7 @@ export default async function CouponsPage() {
       title: c.title,
       description: c.description,
       merchant: c.merchant || "Featured Store",
-      merchantSlug: c.merchantSlug || (c.merchant || "").toLowerCase().replace(/[^a-z0-9]/g, "-"),
+      merchantSlug: c.merchantSlug || relationSlug(c.store) || slugifyMerchant(c.merchant),
       code: c.code,
       discount: c.discount || "Verified Code",
       type: "coupon" as const,
@@ -78,58 +75,36 @@ export default async function CouponsPage() {
       category: c.category || "electronics",
       countries: Array.isArray(c.countries) && c.countries.length > 0 ? c.countries : ["IN"],
     }))
-  } catch {
-    // fallback
+  } catch (err) {
+    console.warn("Unable to load coupon offers from CMS, showing store data only:", err)
   }
 
   // Deduplicate: DB coupons take priority
-  const seenCodes = new Set<string>()
-  const allCoupons: CouponItem[] = []
-
-  for (const c of dbCoupons) {
-    const merchantKey = String(c.merchantSlug || c.merchant || "").toLowerCase()
-    const codeKey = String(c.code || c.title || "").toLowerCase()
-    const key = `${merchantKey}::${codeKey}`
-    seenCodes.add(key)
-    allCoupons.push(c)
-  }
-
-  for (const c of staticCoupons) {
-    const merchantKey = String(c.merchantSlug || c.merchant || "").toLowerCase()
-    const codeKey = String(c.code || c.title || "").toLowerCase()
-    const key = `${merchantKey}::${codeKey}`
-    if (!seenCodes.has(key)) {
-      seenCodes.add(key)
-      allCoupons.push(c)
-    }
-  }
+  const allCoupons = mergeOffers([dbCoupons, staticCoupons], (c) => String(c.code || c.title || ""))
   const couponStores = stores.filter((s) => s.hasCoupons).slice(0, 8)
 
   return (
     <div className="min-h-screen bg-slate-50/60 pb-16">
       {/* Breadcrumb Navigation */}
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Coupons", href: "/coupons" },
-            ]}
-          />
-        </div>
-      </div>
+      <Breadcrumb
+        variant="bar"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Coupons", href: "/coupons" },
+        ]}
+      />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container py-8">
         {/* Page Header */}
         <section className="text-center max-w-3xl mx-auto mb-8">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 text-purple-800 px-3 py-1 text-xs font-black uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 text-purple-800 px-3 py-1 text-xs font-bold uppercase tracking-wider mb-3">
             <Scissors className="h-3.5 w-3.5" />
             Promo Codes &amp; Vouchers
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
             Verified Coupon Codes &amp; Discounts
           </h1>
-          <p className="mt-2 text-[15.5px] text-slate-700 leading-relaxed">
+          <p className="mt-2 text-md text-slate-700 leading-relaxed">
             Tested and verified promo codes updated daily. Click &ldquo;Copy Code &amp; Shop&rdquo; to copy your discount code to your clipboard and auto-redirect to the store checkout.
           </p>
         </section>
@@ -150,64 +125,9 @@ export default async function CouponsPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
-            {couponStores.map((store) => {
-              const logo = store.logoUrl || getBrandLogo(store.slug) || getBrandLogo(store.name)
-              return (
-                <Link
-                  key={store.slug}
-                  href={`/store/${store.slug}`}
-                  className="group flex flex-col items-center p-3 rounded-2xl bg-white border border-slate-200 hover:border-purple-300 hover:shadow-sm transition-all text-center justify-between"
-                >
-                  {/* MOBILE LAYOUT (< 640px) */}
-                  <div className="sm:hidden flex flex-col items-center justify-between text-center w-full gap-2 py-1">
-                    {/* Top: Full brand name with verified badge */}
-                    <div className="flex items-center justify-center gap-1.5 w-full">
-                      <span className="font-extrabold text-[15px] text-slate-900 group-hover:text-purple-700 transition-colors text-center leading-snug break-words">
-                        {store.name}
-                      </span>
-                      <BadgeCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                    </div>
-
-                    {/* Below: Brand logo */}
-                    <div className="h-[52px] w-[52px] rounded-xl overflow-hidden shadow-2xs flex items-center justify-center my-0.5 bg-white border border-slate-200/80 p-1">
-                      <StoreLogoImage
-                        src={logo}
-                        alt={store.name}
-                        initial={store.initial}
-                        bg={store.bg}
-                        size="md"
-                      />
-                    </div>
-
-                    {/* Below the logo: Offers count, such as "2 Offers" */}
-                    <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
-                      2 Offers
-                    </span>
-                  </div>
-
-                  {/* DESKTOP / TABLET LAYOUT (>= 640px) UNCHANGED */}
-                  <div className="hidden sm:flex flex-col items-center w-full">
-                    <StoreLogoImage
-                      src={logo}
-                      alt={store.name}
-                      initial={store.initial}
-                      bg={store.bg}
-                      size="md"
-                      className="mb-2 group-hover:scale-105 transition-transform"
-                    />
-                    <span className="text-xs font-bold text-slate-900 group-hover:text-purple-700 truncate w-full">
-                      {store.name}
-                    </span>
-                    <span className="text-xs font-semibold text-slate-500 mt-0.5">
-                      {(() => {
-                        const count = store.offers ? store.offers.length : (store.couponsCount ?? 0)
-                        return `${count} ${count === 1 ? "offer" : "offers"}`
-                      })()}
-                    </span>
-                  </div>
-                </Link>
-              )
-            })}
+            {couponStores.map((store) => (
+              <StoreTile key={store.slug} store={store} />
+            ))}
           </div>
         </section>
 
@@ -219,7 +139,7 @@ export default async function CouponsPage() {
             slug: s.slug,
             initial: s.initial,
             bg: s.bg,
-            offersCount: s.offers ? s.offers.length : (s.couponsCount ?? 0),
+            offersCount: getOfferCount(s),
             countries: s.countries,
           }))}
         />
@@ -227,10 +147,10 @@ export default async function CouponsPage() {
         {/* SEO & Guide */}
         <section className="mt-16 pt-10 border-t border-slate-200">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-sm max-w-4xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-3">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-3">
               How CouponKodee Codes Work
             </h2>
-            <p className="text-sm sm:text-[15px] text-slate-700 leading-relaxed mb-6">
+            <p className="text-sm sm:text-md text-slate-700 leading-relaxed mb-6">
               Never pay full price again. When you find a store offer with a coupon code, clicking the button automatically copies the code to your clipboard and opens the merchant’s checkout in a new window with tracking enabled.
             </p>
 

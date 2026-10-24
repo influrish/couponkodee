@@ -14,8 +14,9 @@ export default async function AffiliateDisclosurePage() {
   const title = cmsPage?.title || "Affiliate Disclosure"
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container py-8 max-w-4xl">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: "Affiliate Disclosure", href: "/affiliate-disclosure" },
@@ -24,7 +25,7 @@ export default async function AffiliateDisclosurePage() {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">{title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">{title}</h1>
           <p className="text-sm text-muted-foreground">{cmsPage?.subtitle || "Compliance & Transparency Policy"}</p>
         </div>
 

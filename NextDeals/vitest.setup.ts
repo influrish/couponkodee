@@ -1,4 +1,5 @@
-// Any setup scripts you might need go here
+// Load env the same way Next.js does locally
+import dotenv from 'dotenv'
 
-// Load .env files
-import 'dotenv/config'
+dotenv.config({ path: '.env.local' })
+dotenv.config({ path: '.env' })

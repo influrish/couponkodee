@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import Link from "next/link"
+import { useState, useMemo, useEffect } from "react"
+import Link from "@/components/localized-link"
 import { StoreItem } from "@/lib/stores-data"
 import { getBrandLogo } from "@/lib/brand-logos"
 import { useCountry } from "@/components/country-context"
@@ -23,9 +23,11 @@ import {
   Zap,
 } from "lucide-react"
 import { useCashbackVisibility } from "@/components/cashback-context"
+import { formatOfferCount, getOfferCount } from "@/lib/offer-count"
 
 interface StoresExplorerProps {
   stores: StoreItem[]
+  initialSearch?: string
 }
 
 const ALPHABETS = [
@@ -50,15 +52,21 @@ type FilterType = "all" | "popular" | "cashback" | "coupons"
 
 const PAGE_SIZE = 24
 
-export function StoresExplorer({ stores }: StoresExplorerProps) {
+export function StoresExplorer({ stores, initialSearch = "" }: StoresExplorerProps) {
   const { country, setCountry } = useCountry()
   const isCashbackEnabled = useCashbackVisibility()
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState(initialSearch)
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
   const [selectedLetter, setSelectedLetter] = useState("All")
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({})
+
+  // A new header search on the same page re-renders with a different ?q
+  useEffect(() => {
+    setSearch(initialSearch)
+    setVisibleCount(PAGE_SIZE)
+  }, [initialSearch])
 
   // Filter logic
   const filteredStores = useMemo(() => {
@@ -73,10 +81,12 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
       // 1. Text Search
       if (search.trim()) {
         const query = search.toLowerCase().trim()
-        const matchesName = store.name.toLowerCase().includes(query)
-        const matchesCat = store.categoryName.toLowerCase().includes(query)
-        const matchesDesc = store.description.toLowerCase().includes(query)
-        if (!matchesName && !matchesCat && !matchesDesc) return false
+        const haystack = `${store.name} ${store.categoryName} ${store.description}`.toLowerCase()
+        // Also match word-by-word so "amazon us" or "best buy" find "Amazon" / "Best Buy";
+        // short region suffixes (us, uk, ae) are ignored.
+        const words = query.split(/\s+/).filter((w) => w.length >= 3)
+        const matchesWords = words.length > 0 && words.every((w) => haystack.includes(w))
+        if (!haystack.includes(query) && !matchesWords) return false
       }
 
       // 2. Category Filter
@@ -121,7 +131,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
       {/* 1. STORE SEARCH BAR */}
       <div className="relative max-w-2xl mx-auto">
         <div className="relative flex items-center">
-          <Search className="absolute left-4 h-5 w-5 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-4 h-5 w-5 text-slate-500 pointer-events-none" />
           <input
             type="text"
             value={search}
@@ -136,7 +146,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3.5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="absolute right-3.5 p-1 rounded-full text-slate-500 hover:text-slate-600 hover:bg-slate-100"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -240,7 +250,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                       href={`/store/${store.slug}`}
                       className="flex items-center justify-center gap-1.5 w-full"
                     >
-                      <span className="font-extrabold text-[15px] text-slate-900 group-hover:text-purple-700 transition-colors text-center leading-snug break-words">
+                      <span className="font-extrabold text-md text-slate-900 group-hover:text-purple-700 transition-colors text-center leading-snug break-words">
                         {store.name}
                       </span>
                       <BadgeCheck className="h-4 w-4 text-emerald-600 shrink-0" />
@@ -266,18 +276,18 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                               onError={() => setFailedLogos((prev) => ({ ...prev, [store.slug]: true }))}
                             />
                           ) : (
-                            <span className="font-black text-white text-base">{store.initial}</span>
+                            <span className="font-extrabold text-white text-base">{store.initial}</span>
                           )}
                         </Link>
                       )
                     })()}
 
-                    {/* Below the logo: Offers count, such as "2 Offers" */}
+                    {/* Below the logo: live offer count */}
                     <Link
                       href={`/store/${store.slug}`}
                       className="text-xs font-semibold text-slate-500 whitespace-nowrap hover:text-purple-700 transition-colors"
                     >
-                      2 Offers
+                      {formatOfferCount(getOfferCount(store))}
                     </Link>
                   </div>
 
@@ -305,7 +315,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                                   onError={() => setFailedLogos((prev) => ({ ...prev, [store.slug]: true }))}
                                 />
                               ) : (
-                                <span className="text-lg font-black text-white">{store.initial}</span>
+                                <span className="text-lg font-extrabold text-white">{store.initial}</span>
                               )}
                             </Link>
                           )
@@ -315,7 +325,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                           <div className="flex items-center gap-1.5">
                             <Link
                               href={`/store/${store.slug}`}
-                              className="font-black text-[15px] text-slate-900 group-hover:text-purple-700 transition-colors truncate"
+                              className="font-extrabold text-md text-slate-900 group-hover:text-purple-700 transition-colors truncate"
                             >
                               {store.name}
                             </Link>
@@ -350,7 +360,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                           <span className="text-slate-600 font-semibold">Offers:</span>
                           <span className="font-bold text-purple-700 whitespace-nowrap">
                             {(() => {
-                              const count = store.offers ? store.offers.length : (store.couponsCount ?? 0)
+                              const count = getOfferCount(store)
                               return `${count} ${count === 1 ? "active offer" : "active offers"}`
                             })()}
                           </span>
@@ -362,7 +372,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                               <CircleDollarSign className="h-3 w-3 text-emerald-600" />
                               Cashback:
                             </span>
-                            <span className="font-black text-emerald-800">
+                            <span className="font-bold text-emerald-800">
                               {store.cashbackRate}
                             </span>
                           </div>
@@ -383,7 +393,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                     <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
                       <Link
                         href={`/store/${store.slug}`}
-                        className="flex-1 text-center py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-xs transition-colors"
+                        className="flex-1 text-center py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-sm transition-colors"
                       >
                         View Deals
                       </Link>
@@ -392,7 +402,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
                         href={directStoreUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-sm transition-all"
+                        className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-sm transition-all"
                         title={`Visit ${store.name} website`}
                       >
                         <span>Shop Now</span>
@@ -411,7 +421,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
               <button
                 type="button"
                 onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-purple-300 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-bold text-xs shadow-sm transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-purple-300 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-bold text-sm shadow-sm transition-all"
               >
                 <span>Load More Stores ({filteredStores.length - visibleCount} remaining)</span>
                 <ChevronRight className="h-4 w-4" />
@@ -431,7 +441,7 @@ export function StoresExplorer({ stores }: StoresExplorerProps) {
           <button
             type="button"
             onClick={handleReset}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-sm transition-all"
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-sm transition-all"
           >
             <span>Reset All Filters</span>
           </button>

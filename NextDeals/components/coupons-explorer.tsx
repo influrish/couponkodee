@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import Link from "next/link"
+import { useState, useMemo, useEffect } from "react"
+import Link from "@/components/localized-link"
 import { StoreOfferCard, OfferData } from "@/components/store-offer-card"
 import { useCountry } from "@/components/country-context"
 import { CountryFlag } from "@/components/country-flag"
@@ -50,6 +50,13 @@ export function CouponsExplorer({ initialCoupons, stores }: CouponsExplorerProps
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedStore, setSelectedStore] = useState("all")
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  // Region can also change from the header selector; a store from the old
+  // region would otherwise stay selected while hidden from the dropdown.
+  useEffect(() => {
+    setSelectedStore("all")
+    setVisibleCount(PAGE_SIZE)
+  }, [country.code])
 
   const filteredCoupons = useMemo(() => {
     return initialCoupons.filter((c) => {
@@ -104,7 +111,7 @@ export function CouponsExplorer({ initialCoupons, stores }: CouponsExplorerProps
       {/* 1. Search Bar */}
       <div className="relative max-w-2xl mx-auto">
         <div className="relative flex items-center">
-          <Search className="absolute left-4 h-5 w-5 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-4 h-5 w-5 text-slate-500 pointer-events-none" />
           <input
             type="text"
             value={search}
@@ -119,7 +126,7 @@ export function CouponsExplorer({ initialCoupons, stores }: CouponsExplorerProps
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3.5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="absolute right-3.5 p-1 rounded-full text-slate-500 hover:text-slate-600 hover:bg-slate-100"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -207,7 +214,7 @@ export function CouponsExplorer({ initialCoupons, stores }: CouponsExplorerProps
               <button
                 type="button"
                 onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-purple-300 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-bold text-xs shadow-sm transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-300 hover:border-purple-300 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-bold text-sm shadow-sm transition-all"
               >
                 <span>Load More Coupons ({filteredCoupons.length - visibleCount} remaining)</span>
                 <ChevronRight className="h-4 w-4" />
@@ -226,7 +233,7 @@ export function CouponsExplorer({ initialCoupons, stores }: CouponsExplorerProps
           <button
             type="button"
             onClick={handleReset}
-            className="mt-4 px-5 py-2.5 rounded-xl bg-purple-700 text-white font-bold text-xs shadow-sm"
+            className="mt-4 px-5 py-2.5 rounded-xl bg-purple-700 text-white font-bold text-sm shadow-sm"
           >
             Reset Filters
           </button>

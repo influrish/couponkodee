@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { ChevronDown, ShieldCheck } from "lucide-react"
 import { FooterData, defaultFooterData } from "@/lib/cms-types"
+import { BrandLogo } from "@/components/brand-logo"
 
 interface FooterProps {
   initialData?: FooterData
@@ -89,7 +90,7 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
     },
     custom: {
       footer: "border-t border-slate-200/40",
-      heading: "font-black text-inherit",
+      heading: "font-bold text-inherit",
       subtext: "opacity-90",
       muted: "opacity-75",
       taglineBg: "bg-black/5 border-current/15",
@@ -197,7 +198,7 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
       style={Object.keys(customFooterStyle).length > 0 ? customFooterStyle : undefined}
     >
       {/* DESKTOP / TABLET FOOTER (>= 640px) UNCHANGED */}
-      <div className="hidden sm:block container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+      <div className="hidden sm:block container py-12 lg:py-16">
         {/* Main Grid */}
         <div className={gridColsClass}>
           
@@ -205,28 +206,16 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
           <div className="space-y-3.5">
             {/* Brand Logo & Tagline */}
             <div>
-              {brand.customLogoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={brand.customLogoUrl}
-                  alt={`${(brand.brandName || "Coupon").replace(/^c/i, "C")}${(brand.brandHighlight || "Kodee").replace(/^k/i, "K")}`}
-                  className="h-8 object-contain mb-2"
-                />
-              ) : (
-                <Link href="/" className="brand-mark mb-2 inline-flex">
-                  <span className="text-lg sm:text-xl font-black tracking-tight inline-flex items-center">
-                    <span className={themeConfig.heading}>
-                      {(brand.brandName || "Coupon").replace(/^c/i, "C")}
-                    </span>
-                    <span className="text-purple-600">
-                      {(brand.brandHighlight || "Kodee").replace(/^k/i, "K")}
-                    </span>
-                  </span>
-                </Link>
-              )}
+              <BrandLogo
+                brandName={brand.brandName}
+                brandHighlight={brand.brandHighlight}
+                customLogoUrl={brand.customLogoUrl}
+                size="md"
+                tone={themePreset === "dark" ? "light" : "dark"}
+              />
               
               <div className="mt-1">
-                <span className={`inline-block text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md border ${themeConfig.taglineBg}`}>
+                <span className={`inline-block text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md border ${themeConfig.taglineBg}`}>
                   {isCashbackEnabled
                     ? (brand.tagline || "The Smart Savings & Cashback Hub")
                     : (brand.tagline || "The Smart Savings & Cashback Hub").replace(/&?\s*Cashback/gi, "& Deals").replace(/Cashback/gi, "Deals")}
@@ -248,7 +237,7 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
           {/* DYNAMIC MIDDLE COLUMNS (Defaults to: Our Company, Important Links, Explore) */}
           {columns.map((col, idx) => (
             <div key={`${col.title}-${idx}`} className="space-y-3.5">
-              <h3 className={`text-sm font-black uppercase tracking-wider ${themeConfig.heading}`}>
+              <h3 className={`text-sm font-bold uppercase tracking-wider ${themeConfig.heading}`}>
                 {col.title}
               </h3>
               <ul className="space-y-2 text-xs">
@@ -271,7 +260,7 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
           {/* COLUMN 5: Follow Us (Conditional) */}
           {showSocialLinks && (
             <div className="space-y-3.5">
-              <h3 className={`text-sm font-black uppercase tracking-wider ${themeConfig.heading}`}>
+              <h3 className={`text-sm font-bold uppercase tracking-wider ${themeConfig.heading}`}>
                 Follow Us
               </h3>
               <p className={`text-xs leading-relaxed ${themeConfig.muted}`}>
@@ -433,25 +422,13 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
       <div className="sm:hidden">
         {/* Short description at the top */}
         <div className="px-5 pt-7 pb-5 space-y-3">
-          {brand.customLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={brand.customLogoUrl}
-              alt={`${(brand.brandName || "Coupon").replace(/^c/i, "C")}${(brand.brandHighlight || "Kodee").replace(/^k/i, "K")}`}
-              className="h-7 object-contain"
-            />
-          ) : (
-            <Link href="/" className="brand-mark inline-flex">
-              <span className="text-xl font-black tracking-tight inline-flex items-center">
-                <span className={themeConfig.heading}>
-                  {(brand.brandName || "Coupon").replace(/^c/i, "C")}
-                </span>
-                <span className="text-purple-600">
-                  {(brand.brandHighlight || "Kodee").replace(/^k/i, "K")}
-                </span>
-              </span>
-            </Link>
-          )}
+          <BrandLogo
+            brandName={brand.brandName}
+            brandHighlight={brand.brandHighlight}
+            customLogoUrl={brand.customLogoUrl}
+            size="sm"
+            tone={themePreset === "dark" ? "light" : "dark"}
+          />
 
           <p className={`text-xs leading-relaxed ${themeConfig.subtext}`}>
             {isCashbackEnabled
@@ -473,14 +450,14 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
             <button
               type="button"
               onClick={() => toggleSection("company")}
-              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors focus:outline-none"
+              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors"
               aria-expanded={!!openSections["company"]}
             >
               <span className={`text-sm font-bold ${themeConfig.heading}`}>
                 Our Company
               </span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
                   openSections["company"] ? "rotate-180" : ""
                 }`}
               />
@@ -508,14 +485,14 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
             <button
               type="button"
               onClick={() => toggleSection("important")}
-              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors focus:outline-none"
+              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors"
               aria-expanded={!!openSections["important"]}
             >
               <span className={`text-sm font-bold ${themeConfig.heading}`}>
                 Important Links
               </span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
                   openSections["important"] ? "rotate-180" : ""
                 }`}
               />
@@ -543,14 +520,14 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
             <button
               type="button"
               onClick={() => toggleSection("explore")}
-              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors focus:outline-none"
+              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors"
               aria-expanded={!!openSections["explore"]}
             >
               <span className={`text-sm font-bold ${themeConfig.heading}`}>
                 Explore
               </span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
                   openSections["explore"] ? "rotate-180" : ""
                 }`}
               />
@@ -578,14 +555,14 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
             <button
               type="button"
               onClick={() => toggleSection("follow")}
-              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors focus:outline-none"
+              className="w-full flex items-center justify-between py-3.5 px-5 text-left transition-colors"
               aria-expanded={!!openSections["follow"]}
             >
               <span className={`text-sm font-bold ${themeConfig.heading}`}>
                 Follow Us
               </span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
                   openSections["follow"] ? "rotate-180" : ""
                 }`}
               />
@@ -704,7 +681,7 @@ export function Footer({ initialData, isCashbackEnabled = false }: FooterProps) 
           <p className={`font-medium ${themeConfig.legalMuted}`}>
             {formattedCopyright}
           </p>
-          <div className={`flex items-center justify-center gap-3 flex-wrap ${themeConfig.legalMuted} text-[11px]`}>
+          <div className={`flex items-center justify-center gap-3 flex-wrap ${themeConfig.legalMuted} text-2xs`}>
             {copyright.bottomLinks.map((bLink, bIdx) => (
               <span key={bLink.label} className="inline-flex items-center gap-3">
                 <Link

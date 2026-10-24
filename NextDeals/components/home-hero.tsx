@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { useCountry } from "@/components/country-context"
 import { CountryFlag } from "@/components/country-flag"
 import { getAllStores } from "@/lib/stores-data"
@@ -55,7 +55,7 @@ export function HomeHero({ searchTerm = "", heroSettings }: HomeHeroProps) {
 
   return (
     <section className="relative overflow-hidden pt-3 pb-6 sm:py-8 lg:py-16">
-      <div className="container mx-auto px-1.5 sm:px-4 relative z-10">
+      <div className="container relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
           
           {/* LEFT COLUMN: Main Value Prop & Search (7 Cols) - Desktop/Laptop Only */}
@@ -73,7 +73,7 @@ export function HomeHero({ searchTerm = "", heroSettings }: HomeHeroProps) {
 
             {/* 2. Main Headline */}
             <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black text-slate-900 tracking-tight leading-[1.08]">
+              <h1 className="text-6xl font-black text-slate-900 tracking-tighter">
                 {heroSettings?.title &&
                 !heroSettings.title.toLowerCase().includes("cashback") &&
                 heroSettings.title !== "Real Cashback, Instant Verified Coupons" ? (

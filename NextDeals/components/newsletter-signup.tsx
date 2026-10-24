@@ -68,7 +68,7 @@ export function NewsletterSignup({
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2 text-green-800 dark:text-green-200">Welcome to couponkodee!</h3>
             <p className="text-green-700 dark:text-green-300">
-              You'll receive our best deals and exclusive offers straight to your inbox.
+              You&apos;ll receive our best deals and exclusive offers straight to your inbox.
             </p>
           </CardContent>
         </Card>
@@ -86,7 +86,7 @@ export function NewsletterSignup({
         <CardContent className="p-8 relative z-10">
           <Mail className="w-16 h-16 text-purple-600 mx-auto mb-4" />
           <h3 className="article-title text-2xl font-bold mb-2 text-slate-900">{heading}</h3>
-          <p className="text-slate-600 text-[14.5px] leading-relaxed mb-6">
+          <p className="text-slate-600 text-md leading-relaxed mb-6">
             {displaySubtitle}
           </p>
 

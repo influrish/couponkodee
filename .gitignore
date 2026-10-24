@@ -5,9 +5,9 @@ NextDeals/node_modules/
 # Next.js build & caches
 .next/
 NextDeals/.next/
-out/
+/out/
 NextDeals/out/
-build/
+/build/
 NextDeals/build/
 
 # Binaries

@@ -114,3 +114,38 @@
     margin-bottom: 0.75rem !important;
   }
 }
+
+/* ==========================================================================
+   CouponKodee admin theme: same typeface and brand purple as the storefront
+   (tokens in app/globals.css). Payload's own light/dark palettes stay intact.
+   ========================================================================== */
+:root {
+  --ck-brand: #7c3aed;
+  --ck-brand-hover: #6d28d9;
+  --font-body: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --accessibility-outline: 2px solid var(--ck-brand);
+}
+
+.btn--style-primary {
+  --bg-color: var(--ck-brand);
+  --hover-bg: var(--ck-brand-hover);
+  --color: #ffffff;
+  --hover-color: #ffffff;
+}
+
+/* Links inside documents and rich text */
+.rich-text a,
+.field-description a,
+.banner a {
+  color: var(--ck-brand);
+}
+
+/* Keep headings at the storefront's calmer weights */
+.doc-header__title,
+.list-header h1,
+.dashboard h1,
+.login__brand {
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}

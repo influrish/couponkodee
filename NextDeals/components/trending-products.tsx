@@ -85,7 +85,8 @@ export function TrendingProducts({ products }: TrendingProductsProps) {
               <div className="text-lg font-bold text-primary">₹{product.pricing?.currentPrice}</div>
             </CardContent>
           </Card>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

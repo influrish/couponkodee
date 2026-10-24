@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useMemo } from "react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { getBrandLogo } from "@/lib/brand-logos"
 
 interface PopularBrandsRotatorProps {
@@ -273,7 +273,7 @@ export function PopularBrandsRotator({
                           loading="eager"
                         />
                       ) : (
-                        <span className="font-black text-sm text-purple-700">
+                        <span className="font-bold text-sm text-purple-700">
                           {storeName.charAt(0)}
                         </span>
                       )}
@@ -281,10 +281,10 @@ export function PopularBrandsRotator({
 
                     {/* Brand Name & Tagline */}
                     <div className="min-w-0 pr-1 text-left">
-                      <span className="block font-black text-[15px] sm:text-[14px] text-slate-900 group-hover:text-purple-700 tracking-tight transition-colors whitespace-nowrap leading-tight">
+                      <span className="block font-extrabold text-md sm:text-sm text-slate-900 group-hover:text-purple-700 tracking-tight transition-colors whitespace-nowrap leading-tight">
                         {storeName}
                       </span>
-                      <span className="block text-[13px] sm:text-xs font-semibold text-slate-500 group-hover:text-purple-600 whitespace-nowrap mt-0.5 transition-colors">
+                      <span className="block text-xs sm:text-xs font-semibold text-slate-500 group-hover:text-purple-600 whitespace-nowrap mt-0.5 transition-colors">
                         {profile.tagline}
                       </span>
                     </div>

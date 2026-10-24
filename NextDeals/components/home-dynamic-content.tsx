@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { useCountry } from "@/components/country-context"
 import { CountryFlag } from "@/components/country-flag"
 import { isEntityInCountry } from "@/lib/countries-data"
@@ -13,7 +13,6 @@ import { DealCard } from "@/components/deal-card"
 import { StoreOfferCard } from "@/components/store-offer-card"
 import {
   ArrowRight,
-  BadgeCheck,
   ChevronRight,
   CircleDollarSign,
   Globe,
@@ -22,6 +21,8 @@ import {
   Zap,
 } from "lucide-react"
 import { useCashbackVisibility } from "@/components/cashback-context"
+import { formatOfferCount, getOfferCount } from "@/lib/offer-count"
+import { VerifiedName } from "@/components/store-tile"
 
 interface HomeDynamicContentProps {
   allStores: StoreItem[]
@@ -173,7 +174,7 @@ export function HomeDynamicContent({
 
   return (
     <div>
-      <div className="container mx-auto px-4">
+      <div className="container">
         {/* 1. POPULAR REGIONAL STORES */}
         <section id="stores" className="section-block pt-0">
           <div className="section-heading">
@@ -185,7 +186,7 @@ export function HomeDynamicContent({
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3.5">
             {regionalStores.slice(0, 8).map((store) => {
               const isFailed = failedLogos[store.slug]
               const logo = !isFailed ? (store.logoUrl || getBrandLogo(store.slug) || getBrandLogo(store.name)) : null
@@ -198,12 +199,9 @@ export function HomeDynamicContent({
                   {/* MOBILE VIEW (< 640px) */}
                   <div className="sm:hidden flex flex-col items-center justify-between text-center w-full gap-2 py-1">
                     {/* Top: Full brand name with verified badge */}
-                    <div className="flex items-center justify-center gap-1.5 w-full">
-                      <span className="font-extrabold text-[15px] text-slate-900 group-hover:text-purple-700 transition-colors text-center leading-snug break-words">
-                        {store.name}
-                      </span>
-                      <BadgeCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                    </div>
+                    <span className="line-clamp-2 text-md font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-purple-700">
+                      <VerifiedName name={store.name} />
+                    </span>
 
                     {/* Below: Brand logo */}
                     <div
@@ -220,13 +218,13 @@ export function HomeDynamicContent({
                           onError={() => setFailedLogos((prev) => ({ ...prev, [store.slug]: true }))}
                         />
                       ) : (
-                        <span className="font-black text-white text-base">{store.initial}</span>
+                        <span className="font-extrabold text-white text-base">{store.initial}</span>
                       )}
                     </div>
 
-                    {/* Below the logo: Offers count, such as "2 Offers" */}
+                    {/* Below the logo: live offer count */}
                     <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
-                      2 Offers
+                      {formatOfferCount(getOfferCount(store))}
                     </span>
                   </div>
 
@@ -253,11 +251,11 @@ export function HomeDynamicContent({
                       <strong className="truncate group-hover:text-purple-700 transition-colors">
                         {store.name}
                       </strong>
-                      <span className="text-xs font-extrabold text-emerald-600 truncate mt-0.5 block">
+                      <span className="text-xs font-bold text-emerald-600 truncate mt-0.5 block">
                         {isCashbackEnabled ? (store.cashbackRate || "Verified Coupons") : "Verified Coupons"}
                       </span>
                       {(() => {
-                        const count = store.offers ? store.offers.length : (store.couponsCount ?? 0)
+                        const count = getOfferCount(store)
                         return (
                           <small className="text-slate-500 font-semibold whitespace-nowrap block mt-0.5">
                             {count} {count === 1 ? "live offer" : "live offers"}
@@ -331,14 +329,14 @@ export function HomeDynamicContent({
                   <CircleDollarSign className="h-7 w-7 sm:h-8 sm:w-8 text-emerald-300" />
                 </div>
                 <div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-emerald-200 text-xs font-black uppercase tracking-wider mb-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-emerald-200 text-xs font-bold uppercase tracking-wider mb-2">
                     <Sparkles className="h-3.5 w-3.5 text-emerald-300" />
                     Maximize Your Savings in {country.currency} {country.currencyCode}
                   </span>
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-snug">
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight leading-snug">
                     Earn Extra Cashback on Top of Store Discounts!
                   </h2>
-                  <p className="mt-2 text-purple-100 text-sm sm:text-[15px] max-w-2xl leading-relaxed">
+                  <p className="mt-2 text-purple-100 text-sm sm:text-md max-w-2xl leading-relaxed">
                     Shop at top {country.name} stores through CouponKodee and earn real money back directly into your account in {country.currency} {country.currencyCode}.
                   </p>
                 </div>
@@ -347,7 +345,7 @@ export function HomeDynamicContent({
               <div className="relative z-10 shrink-0 w-full sm:w-auto">
                 <Link
                   href="/cashback"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-slate-900 hover:text-emerald-950 font-black text-sm sm:text-base shadow-lg hover:shadow-2xl hover:-translate-y-0.5 active:scale-95 transition-all whitespace-nowrap group border border-white/80"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-slate-900 hover:text-emerald-950 font-bold text-sm sm:text-base shadow-lg hover:shadow-2xl hover:-translate-y-0.5 active:scale-95 transition-all whitespace-nowrap group border border-white/80"
                 >
                   <span>Explore Cashback Offers</span>
                   <ArrowRight className="h-4 w-4 text-emerald-600 group-hover:translate-x-1 transition-transform" />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Breadcrumb } from "@/components/breadcrumb"
+import { ContactForm } from "@/components/contact-form"
 import { Mail, MessageSquare, MapPin } from "lucide-react"
 import { getSiteSettingsData, getCmsPage } from "@/lib/cms-settings"
 
@@ -18,8 +19,9 @@ export default async function ContactPage() {
     "Have a question, feedback about a coupon, or interested in partnering with CouponKodee? We'd love to hear from you."
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container py-8 max-w-4xl">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: "Contact Us", href: "/contact" },
@@ -28,7 +30,7 @@ export default async function ContactPage() {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">{title}</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
             {subtitle}
           </p>
@@ -85,52 +87,7 @@ export default async function ContactPage() {
           <p className="text-sm text-muted-foreground">
             Fill out the form below and our team will get back to you within 24-48 business hours.
           </p>
-          <form className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">Your Name</label>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email Address</label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="subject" className="text-sm font-medium">Subject</label>
-              <input
-                id="subject"
-                type="text"
-                placeholder="How can we help?"
-                className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="message" className="text-sm font-medium">Message</label>
-              <textarea
-                id="message"
-                rows={5}
-                placeholder="Tell us what's on your mind..."
-                className="w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <button
-              type="button"
-              className="px-6 py-2 bg-primary text-primary-foreground font-medium text-sm rounded-md hover:bg-primary/90 transition-colors"
-            >
-              Send Message
-            </button>
-          </form>
+          <ContactForm />
         </section>
       </div>
     </div>

@@ -27,6 +27,20 @@ export interface OfferData {
 
 interface StoreOfferCardProps {
   offer: OfferData
+  /** "card" (grid tile, default) or "row" (full-width list item used on store pages). */
+  variant?: "card" | "row"
+  /** Marks the store's best offer in row layout. */
+  featured?: boolean
+}
+
+/** Splits a badge like "10% OFF" or "FLAT ₹500" into a big amount and a small label for the row layout. */
+function splitDiscount(badge: string, isCoupon: boolean): { amount: string; label: string } {
+  const percent = badge.match(/\d+(?:\.\d+)?%/)
+  if (percent) return { amount: percent[0], label: /cashback/i.test(badge) ? "CASHBACK" : "OFF" }
+  const money = badge.match(/[₹$€£]\s*[\d,]+/)
+  if (money) return { amount: money[0].replace(/\s+/g, ""), label: /cashback/i.test(badge) ? "CASHBACK" : "OFF" }
+  if (/bogo/i.test(badge)) return { amount: "BOGO", label: "FREE" }
+  return { amount: isCoupon ? "CODE" : "DEAL", label: "VERIFIED" }
 }
 
 import { getBrandLogo } from "@/lib/brand-logos"
@@ -53,18 +67,26 @@ function getDiscountBadge(discount?: string | null, title?: string): string {
   return "Verified Offer"
 }
 
-export function StoreOfferCard({ offer }: StoreOfferCardProps) {
+export function StoreOfferCard({ offer, variant = "card", featured = false }: StoreOfferCardProps) {
   const isCashbackEnabled = useCashbackVisibility()
   const isCashback = offer.type === "cashback" || Boolean(offer.discount && offer.discount.toLowerCase().includes("cashback"))
 
   if (!isCashbackEnabled && (isCashback || /cashback/i.test(offer.title) || /cashback/i.test(offer.description || ""))) {
     return null
   }
+  return <StoreOfferCardContent offer={offer} isCashback={isCashback} variant={variant} featured={featured} />
+}
 
+function StoreOfferCardContent({
+  offer,
+  isCashback,
+  variant,
+  featured,
+}: StoreOfferCardProps & { isCashback: boolean }) {
   const [copied, setCopied] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [logoError, setLogoError] = useState(false)
-  const redirectTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const copyResetTimerRef = useRef<NodeJS.Timeout | null>(null)
   const isCoupon = Boolean(offer.code && offer.code.trim().length > 0) || offer.type === "coupon"
   const merchantName = offer.merchant || "Featured Partner"
   const logo = getBrandLogo(merchantName)
@@ -72,7 +94,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
 
   useEffect(() => {
     return () => {
-      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current)
+      if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current)
     }
   }, [])
 
@@ -88,7 +110,8 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
         navigator.clipboard.writeText(offer.code).catch(() => {})
       }
       setCopied(true)
-      setTimeout(() => setCopied(false), 3500)
+      if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current)
+      copyResetTimerRef.current = setTimeout(() => setCopied(false), 3500)
       setIsModalOpen(true)
 
       // Open store in another tab / new page
@@ -110,8 +133,113 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
   }
 
   const handleCloseModal = () => {
-    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current)
     setIsModalOpen(false)
+  }
+
+  const modal = isModalOpen && (
+    <CouponModal
+      isOpen={isModalOpen}
+      onClose={handleCloseModal}
+      coupon={{
+        title: offer.title,
+        code: offer.code || "",
+        merchant: offer.merchant,
+        discount: offer.discount,
+        description: offer.description,
+        affiliateUrl: offer.affiliateUrl,
+        isVerified: offer.isVerified ?? true,
+      }}
+    />
+  )
+
+  if (variant === "row") {
+    const { amount, label } = splitDiscount(discountBadge, isCoupon)
+    const hasCode = Boolean(offer.code && offer.code.trim())
+    const accent = isCashback ? "emerald" : "purple"
+
+    return (
+      <article
+        onClick={handleCardClick}
+        className={`group relative flex cursor-pointer flex-col gap-3 rounded-2xl border bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-950/5 sm:flex-row sm:items-center sm:gap-5 sm:p-5 ${
+          featured ? "border-purple-300 ring-1 ring-purple-200" : "border-slate-200 hover:border-purple-300"
+        }`}
+      >
+        {featured && (
+          <span className="absolute -top-2.5 left-4 rounded-full bg-amber-400 px-2.5 py-0.5 text-2xs font-bold uppercase tracking-wider text-amber-950 shadow-sm">
+            Top offer
+          </span>
+        )}
+
+        <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-4">
+          {/* Discount box: the number shoppers scan for */}
+          <div
+            className={`flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl border-2 border-dashed text-center sm:h-20 sm:w-20 ${
+              accent === "emerald" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-purple-300 bg-purple-50 text-purple-700"
+            }`}
+          >
+            <span className="text-lg font-black leading-none sm:text-2xl">{amount}</span>
+            <span className="mt-1 text-2xs font-bold tracking-wider">{label}</span>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 text-md font-bold leading-snug text-slate-900 transition-colors group-hover:text-purple-700 sm:text-base">
+              {isCoupon ? cleanOfferTitle(offer.title, offer.discount) : offer.title}
+            </h3>
+            {offer.description && (
+              <p className="mt-1 line-clamp-2 text-sm text-slate-600">{offer.description}</p>
+            )}
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-slate-500">
+              {offer.isVerified !== false && (
+                <span className="inline-flex items-center gap-1 text-emerald-700">
+                  <BadgeCheck className="h-3.5 w-3.5" /> Verified
+                </span>
+              )}
+              <span>{isCashback ? "Cashback" : hasCode ? "Coupon code" : "Deal, no code needed"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA: "Show Code" with a peek of the code is the highest-converting pattern for coupons */}
+        <div className="shrink-0 sm:w-48">
+          {hasCode && !copied ? (
+            <button
+              type="button"
+              onClick={handleAction}
+              className="relative flex h-11 w-full items-stretch overflow-hidden rounded-xl border-2 border-dashed border-purple-400 bg-white text-sm font-bold"
+              aria-label={`Show ${merchantName} coupon code`}
+            >
+              <span className="flex flex-1 items-center justify-end pr-3 font-mono tracking-widest text-purple-700">
+                {offer.code!.slice(-3)}
+              </span>
+              <span className="absolute inset-y-0 left-0 right-12 flex items-center justify-center gap-1.5 rounded-r-[1.25rem] bg-purple-700 text-white transition-[right] group-hover:right-14">
+                Show Code
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAction}
+              className={`flex h-11 w-full items-center justify-center gap-1.5 rounded-xl text-sm font-bold text-white shadow-sm transition-all active:scale-[0.98] ${
+                copied ? "bg-emerald-600" : isCashback ? "bg-emerald-600 hover:bg-emerald-700" : "bg-purple-700 hover:bg-purple-800"
+              }`}
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" /> Copied, store opened
+                </>
+              ) : (
+                <>
+                  {isCashback ? "Activate Cashback" : "Get Deal"}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </>
+              )}
+            </button>
+          )}
+        </div>
+
+        {modal}
+      </article>
+    )
   }
 
   return (
@@ -124,7 +252,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
         <div className="sm:hidden flex flex-col items-center text-center">
           {/* 1. Brand Name (Centered, prominent, matching reference spacing) */}
           <div className="flex items-center justify-center w-full">
-            <span className="text-[16px] font-extrabold text-slate-900 tracking-tight truncate text-center">
+            <span className="text-base font-extrabold text-slate-900 tracking-tight truncate text-center">
               {merchantName}
             </span>
           </div>
@@ -150,7 +278,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
 
           {/* 3. Offer Details / Title (Centered, 2-line consistent height) */}
           <div className="flex items-center justify-center w-full min-h-[2.4rem]">
-            <h3 className="text-[13px] font-semibold text-slate-800 leading-snug line-clamp-2 text-center">
+            <h3 className="text-xs font-semibold text-slate-800 leading-snug line-clamp-2 text-center">
               {isCoupon ? cleanOfferTitle(offer.title, offer.discount) : offer.title}
             </h3>
           </div>
@@ -181,7 +309,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
               </span>
             </div>
 
-            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+            <span className="shrink-0 inline-flex items-center gap-1 text-2xs font-semibold text-emerald-600">
               <BadgeCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
               <span>Verified</span>
             </span>
@@ -189,7 +317,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
 
           {/* Desktop Offer Title */}
           <div className="mt-3.5 min-h-[2.5rem] flex items-start">
-            <h3 className="text-[15px] font-bold text-slate-900 group-hover:text-purple-700 transition-colors leading-snug tracking-tight line-clamp-2">
+            <h3 className="text-md font-bold text-slate-900 group-hover:text-purple-700 transition-colors leading-snug tracking-tight line-clamp-2">
               {offer.title}
             </h3>
           </div>
@@ -209,7 +337,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
         <button
           type="button"
           onClick={handleAction}
-          className={`w-full inline-flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold text-[12px] min-[360px]:text-[13px] sm:text-sm transition-all shadow-sm active:scale-[0.98] ${
+          className={`w-full inline-flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold text-xs min-[360px]:text-xs sm:text-sm transition-all shadow-sm active:scale-[0.98] ${
             copied
               ? "bg-emerald-600 text-white shadow-emerald-600/20"
               : isCashback
@@ -246,21 +374,7 @@ export function StoreOfferCard({ offer }: StoreOfferCardProps) {
       </div>
 
       {/* Pop of Code / Offer Details Modal */}
-      {isModalOpen && (
-        <CouponModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          coupon={{
-            title: offer.title,
-            code: offer.code || "",
-            merchant: offer.merchant,
-            discount: offer.discount,
-            description: offer.description,
-            affiliateUrl: offer.affiliateUrl,
-            isVerified: offer.isVerified ?? true,
-          }}
-        />
-      )}
+      {modal}
     </article>
   )
 }

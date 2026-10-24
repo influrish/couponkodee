@@ -46,7 +46,10 @@ export function DealCard({ product }: DealCardProps) {
   ) {
     return null
   }
+  return <DealCardContent product={product} />
+}
 
+function DealCardContent({ product }: DealCardProps) {
   const merchantKey = product.merchant?.toLowerCase() || "other"
   const merchantName = merchantPills[merchantKey] || product.merchant || "Featured Partner"
   const logo = getBrandLogo(product.merchant || merchantKey)
@@ -69,7 +72,7 @@ export function DealCard({ product }: DealCardProps) {
         <div className="sm:hidden flex flex-col items-center text-center">
           {/* 1. Brand Name (Centered, prominent, matching reference spacing) */}
           <div className="flex items-center justify-center w-full">
-            <span className="text-[16px] font-extrabold text-slate-900 tracking-tight truncate text-center">
+            <span className="text-base font-extrabold text-slate-900 tracking-tight truncate text-center">
               {merchantName}
             </span>
           </div>
@@ -95,7 +98,7 @@ export function DealCard({ product }: DealCardProps) {
 
           {/* 3. Offer Details / Title (Centered, 2-line consistent height) */}
           <div className="flex items-center justify-center w-full min-h-[2.4rem]">
-            <h3 className="text-[13px] font-semibold text-slate-800 leading-snug line-clamp-2 text-center">
+            <h3 className="text-xs font-semibold text-slate-800 leading-snug line-clamp-2 text-center">
               {product.title}
             </h3>
           </div>
@@ -126,7 +129,7 @@ export function DealCard({ product }: DealCardProps) {
               </span>
             </div>
 
-            <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+            <span className="shrink-0 inline-flex items-center gap-1 text-2xs font-semibold text-emerald-600">
               <BadgeCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
               <span>Verified</span>
             </span>
@@ -134,7 +137,7 @@ export function DealCard({ product }: DealCardProps) {
 
           {/* Desktop Offer Title */}
           <div className="mt-3.5 min-h-[2.75rem] flex items-start">
-            <h3 className="text-[15px] font-bold text-slate-900 group-hover:text-purple-700 transition-colors leading-snug tracking-tight line-clamp-2">
+            <h3 className="text-md font-bold text-slate-900 group-hover:text-purple-700 transition-colors leading-snug tracking-tight line-clamp-2">
               {product.title}
             </h3>
           </div>
@@ -155,7 +158,7 @@ export function DealCard({ product }: DealCardProps) {
           onClick={(e) => e.stopPropagation()}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full inline-flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold text-[12px] min-[360px]:text-[13px] sm:text-sm bg-purple-700 hover:bg-purple-800 text-white shadow-sm hover:shadow-md hover:shadow-purple-600/25 transition-all active:scale-[0.98]"
+          className="w-full inline-flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-xl font-bold text-xs min-[360px]:text-xs sm:text-sm bg-purple-700 hover:bg-purple-800 text-white shadow-sm hover:shadow-md hover:shadow-purple-600/25 transition-all active:scale-[0.98]"
         >
           <span className="sm:hidden whitespace-nowrap tracking-tight">View Deal</span>
           <span className="hidden sm:inline whitespace-nowrap tracking-tight">Grab Deal &amp; Visit Store</span>

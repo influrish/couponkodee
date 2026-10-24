@@ -13,8 +13,9 @@ export default async function TermsPage() {
   const title = cmsPage?.title || "Terms of Service"
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container py-8 max-w-4xl">
       <Breadcrumb
+        className="mb-6"
         items={[
           { label: "Home", href: "/" },
           { label: "Terms of Service", href: "/terms" },
@@ -23,7 +24,7 @@ export default async function TermsPage() {
 
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">{title}</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">{title}</h1>
           <p className="text-sm text-muted-foreground">{cmsPage?.subtitle || "Last updated: September 2026"}</p>
         </div>
 

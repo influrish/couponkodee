@@ -30,6 +30,18 @@ interface StoreOffersViewProps {
 
 type TabType = "all" | "coupon" | "deal" | "cashback"
 
+// Search and the verified toggle only earn their space on stores with many offers
+const SEARCH_THRESHOLD = 6
+
+/** Ranks offers so the strongest one leads: biggest % (or currency) saving, then offers with a code. */
+function offerScore(o: { discount: string; title: string; code?: string }): number {
+  const text = `${o.discount} ${o.title}`
+  const percent = text.match(/(\d+(?:\.\d+)?)\s*%/)
+  const money = text.match(/[₹$€£]\s*([\d,]+)/)
+  const saving = percent ? Number(percent[1]) : money ? Math.min(Number(money[1].replace(/,/g, "")) / 50, 50) : 0
+  return saving + (o.code ? 0.5 : 0)
+}
+
 export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
   const isCashbackEnabled = useCashbackVisibility()
   const [activeTab, setActiveTab] = useState<TabType>("all")
@@ -37,10 +49,10 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
   const [onlyVerified, setOnlyVerified] = useState(false)
 
   const visibleBaseOffers = useMemo(() => {
-    if (isCashbackEnabled) return offers
-    return offers.filter(
-      (o) => o.type !== "cashback" && !/cashback/i.test(o.title) && !/cashback/i.test(o.discount)
-    )
+    const visible = isCashbackEnabled
+      ? offers
+      : offers.filter((o) => o.type !== "cashback" && !/cashback/i.test(o.title) && !/cashback/i.test(o.discount))
+    return [...visible].sort((a, b) => offerScore(b) - offerScore(a))
   }, [offers, isCashbackEnabled])
 
   const isCouponOffer = (o: StoreOffersViewProps["offers"][0]) =>
@@ -98,49 +110,52 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
   return (
     <div className="space-y-5">
       {/* 1. In-Store Search & Verified Toggle */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={`Search ${storeName} offers (e.g. 50% off, code, app)...`}
-            className="w-full pl-9 pr-9 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-600 transition-all"
-          />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200"
-              aria-label="Clear search"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </div>
+      {visibleBaseOffers.length > SEARCH_THRESHOLD && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={`Search ${storeName} offers (e.g. 50% off, code, app)...`}
+              className="w-full pl-9 pr-9 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-600 transition-all"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-600 rounded-full hover:bg-slate-200"
+                aria-label="Clear search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
 
-        <button
-          type="button"
-          onClick={() => setOnlyVerified(!onlyVerified)}
-          className={`shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
-            onlyVerified
-              ? "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs"
-              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-          }`}
-        >
-          <BadgeCheck className={`h-4 w-4 ${onlyVerified ? "text-emerald-600" : "text-slate-400"}`} />
-          <span>Verified Only</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => setOnlyVerified(!onlyVerified)}
+            className={`shrink-0 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-all border ${
+              onlyVerified
+                ? "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs"
+                : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            <BadgeCheck className={`h-4 w-4 ${onlyVerified ? "text-emerald-600" : "text-slate-500"}`} />
+            <span>Verified Only</span>
+          </button>
+        </div>
+      )}
 
       {/* 2. Offer Type Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* One swipeable row on mobile instead of wrapping onto several lines */}
+        <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
               activeTab === "all"
                 ? "bg-purple-700 text-white shadow-sm"
                 : "bg-white border border-slate-200 text-slate-700 hover:bg-purple-50"
@@ -154,7 +169,7 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
             <button
               type="button"
               onClick={() => setActiveTab("coupon")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === "coupon"
                   ? "bg-purple-700 text-white shadow-sm"
                   : "bg-white border border-slate-200 text-slate-700 hover:bg-purple-50"
@@ -169,7 +184,7 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
             <button
               type="button"
               onClick={() => setActiveTab("deal")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === "deal"
                   ? "bg-purple-700 text-white shadow-sm"
                   : "bg-white border border-slate-200 text-slate-700 hover:bg-purple-50"
@@ -184,7 +199,7 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
             <button
               type="button"
               onClick={() => setActiveTab("cashback")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === "cashback"
                   ? "bg-emerald-700 text-white shadow-sm"
                   : "bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50"
@@ -214,8 +229,8 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
 
       {/* 3. Offers Grid */}
       {filteredOffers.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-1 gap-3 sm:gap-4">
-          {filteredOffers.map((offer) => {
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
+          {filteredOffers.map((offer, index) => {
             const cardOffer: OfferData = {
               id: offer.id,
               title: offer.title,
@@ -228,12 +243,13 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
               isVerified: offer.isVerified,
             }
 
-            return <StoreOfferCard key={offer.id} offer={cardOffer} />
+            const isTopOffer = index === 0 && activeTab === "all" && !search && filteredOffers.length > 1
+            return <StoreOfferCard key={offer.id} offer={cardOffer} variant="row" featured={isTopOffer} />
           })}
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed border-slate-300 p-10 text-center bg-white shadow-xs">
-          <p className="text-base font-black text-slate-900">
+          <p className="text-base font-extrabold text-slate-900">
             No matching offers found
           </p>
           <p className="text-xs text-slate-600 mt-1 max-w-sm mx-auto">
@@ -244,7 +260,7 @@ export function StoreOffersView({ storeName, offers }: StoreOffersViewProps) {
           <button
             type="button"
             onClick={handleReset}
-            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-xs transition-all"
+            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-xs transition-all"
           >
             Show All {storeName} Offers
           </button>

@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto"
 import dotenv from "dotenv"
 import { getPayload } from "payload"
 import { initialStores } from "../lib/stores-data"
@@ -10,8 +11,8 @@ async function seedCompleteDatabase() {
   console.log("🌱 Starting full database synchronization with Payload CMS...")
   const payload = await getPayload({ config })
 
-  // 1. Ensure Admin User Exists
-  const adminEmail = "admin@couponkodee.com"
+  // 1. Ensure Admin User Exists (credentials come from env, never from source)
+  const adminEmail = (process.env.SEED_ADMIN_EMAIL || "admin@couponkodee.com").trim().toLowerCase()
   const existingUsers = await payload.find({
     collection: "users",
     where: { email: { equals: adminEmail } },
@@ -19,18 +20,23 @@ async function seedCompleteDatabase() {
   })
 
   if (existingUsers.docs.length === 0) {
+    const configuredPassword = process.env.SEED_ADMIN_PASSWORD?.trim()
+    const adminPassword = configuredPassword || randomBytes(12).toString("base64url")
     await payload.create({
       collection: "users",
       data: {
         email: adminEmail,
-        password: "admin123",
+        password: adminPassword,
         name: "Admin Manager",
         role: "admin",
       },
     })
-    console.log("✅ Created default administrator: admin@couponkodee.com (password: admin123)")
+    console.log(`✅ Created administrator: ${adminEmail}`)
+    if (!configuredPassword) {
+      console.log(`🔑 Generated password (shown once, store it safely): ${adminPassword}`)
+    }
   } else {
-    console.log("ℹ️ Administrator account already exists: admin@couponkodee.com")
+    console.log(`ℹ️ Administrator account already exists: ${adminEmail}`)
   }
 
   // 2. Seed Categories

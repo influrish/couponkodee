@@ -1,12 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 export const dynamic = "force-dynamic"
 
-export async function POST(request: NextRequest) {
-  try {
-    const { email, firstName, lastName } = await request.json()
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-    if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 })
+function optionalName(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim().slice(0, 80) : undefined
+}
+
+export async function POST(request: NextRequest) {
+  const limit = checkRateLimit(`newsletter:${getClientIp(request)}`, 5, 60_000)
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    )
+  }
+
+  try {
+    const body = await request.json().catch(() => ({}))
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : ""
+
+    if (!EMAIL_PATTERN.test(email) || email.length > 254) {
+      return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 })
     }
 
     const { getPayloadClient } = await import("@/src/lib/payload")
@@ -20,6 +36,7 @@ export async function POST(request: NextRequest) {
           equals: email,
         },
       },
+      limit: 1,
     })
 
     if (existingSubscriber.docs.length > 0) {
@@ -31,8 +48,8 @@ export async function POST(request: NextRequest) {
       collection: "newsletter-subscribers",
       data: {
         email,
-        firstName,
-        lastName,
+        firstName: optionalName(body.firstName),
+        lastName: optionalName(body.lastName),
         isActive: true,
         source: "website",
       },
@@ -45,6 +62,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Newsletter subscription error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Subscription is temporarily unavailable. Please try again later." }, { status: 503 })
   }
 }

@@ -18,6 +18,10 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
+
+# local MongoDB data (pnpm db:local)
+/.data/
 
 # vercel
 .vercel
@@ -28,4 +32,8 @@ next-env.d.ts
 
 # open-next & cloudflare
 .open-next/
-.wrangler/
+.wrangler/
+
+# Playwright output
+/test-results/
+/playwright-report/

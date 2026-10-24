@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { StoreItem } from "@/lib/stores-data"
 import { getBrandLogo } from "@/lib/brand-logos"
 import { useCountry } from "@/components/country-context"
@@ -71,7 +71,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
       {/* Search Bar */}
       <div className="relative max-w-2xl mx-auto">
         <div className="relative flex items-center">
-          <Search className="absolute left-4 h-5 w-5 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-4 h-5 w-5 text-slate-500 pointer-events-none" />
           <input
             type="text"
             value={search}
@@ -83,7 +83,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="absolute right-3.5 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="absolute right-3.5 p-1 rounded-full text-slate-500 hover:text-slate-600 hover:bg-slate-100"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -125,7 +125,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
         <div className="flex items-center gap-2 font-medium">
           <CountryFlag code={country.code} size="md" />
           <span>
-            Active Region: <strong>{country.name} ({country.code})</strong> &bull; Currency: <strong>{country.currencySymbol} {country.currency}</strong>
+            Active Region: <strong>{country.name} ({country.code})</strong> &bull; Currency: <strong>{country.currency} {country.currencyCode}</strong>
           </span>
         </div>
         {country.code !== "GLOBAL" ? (
@@ -214,7 +214,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
                           onError={() => setFailedLogos((prev) => ({ ...prev, [store.slug]: true }))}
                         />
                       ) : (
-                        <span className="text-lg font-black text-white">{store.initial}</span>
+                        <span className="text-lg font-extrabold text-white">{store.initial}</span>
                       )}
                     </Link>
 
@@ -222,7 +222,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
                       <div className="flex items-center gap-1.5">
                         <Link
                           href={`/store/${store.slug}`}
-                          className="font-black text-[15px] text-slate-900 group-hover:text-emerald-700 transition-colors truncate"
+                          className="font-extrabold text-md text-slate-900 group-hover:text-emerald-700 transition-colors truncate"
                         >
                           {store.name}
                         </Link>
@@ -261,7 +261,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
                   <div className="my-3 rounded-xl bg-emerald-50/80 border border-emerald-100 p-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <CircleDollarSign className="h-4 w-4 text-emerald-600 shrink-0" />
-                      <span className="text-xs font-black text-emerald-950">
+                      <span className="text-xs font-bold text-emerald-950">
                         {store.cashbackRate || "Earn Cashback"}
                       </span>
                     </div>
@@ -280,7 +280,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
                 <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
                   <Link
                     href={`/store/${store.slug}`}
-                    className="flex-1 text-center py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+                    className="flex-1 text-center py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors"
                   >
                     View Offers
                   </Link>
@@ -289,7 +289,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
                     href={redirectUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm hover:shadow transition-all"
                   >
                     <span>Activate</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -313,7 +313,7 @@ export function CashbackExplorer({ stores }: CashbackExplorerProps) {
               setSearch("")
               setSelectedCategory("all")
             }}
-            className="mt-4 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-sm"
+            className="mt-4 px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-sm"
           >
             Reset Filters
           </button>

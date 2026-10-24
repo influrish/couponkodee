@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import Link from "next/link"
+import Link from "@/components/localized-link"
 import { getDbStores } from "@/lib/db-stores"
 import { getCashbackVisibility } from "@/lib/cms-settings"
 import { Breadcrumb } from "@/components/breadcrumb"
@@ -81,26 +81,23 @@ export default async function CashbackPage() {
   return (
     <div className="min-h-screen bg-slate-50/60 pb-16">
       {/* Breadcrumb Navigation */}
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <Breadcrumb
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Cashback", href: "/cashback" },
-            ]}
-          />
-        </div>
-      </div>
+      <Breadcrumb
+        variant="bar"
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Cashback", href: "/cashback" },
+        ]}
+      />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container py-8">
         {/* 1. HERO CASHBACK BANNER */}
         <section className="mb-10 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 p-6 sm:p-10 md:p-12 text-white shadow-lg relative overflow-hidden">
           <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-900/50 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-emerald-200 mb-4 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-900/50 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-emerald-200 mb-4 backdrop-blur-sm">
               <Zap className="h-3.5 w-3.5" />
               Real Bank-Transferable Money
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+            <h1 className="text-5xl font-black tracking-tight leading-tight">
               Earn Extra Cashback on Top of Store Discounts!
             </h1>
             <p className="mt-3 text-sm sm:text-base text-emerald-100 leading-relaxed">
@@ -125,20 +122,20 @@ export default async function CashbackPage() {
         {/* 2. HOW CASHBACK WORKS (4 Simple Steps) */}
         <section className="mb-12">
           <div className="text-center max-w-xl mx-auto mb-8">
-            <p className="text-xs font-black uppercase tracking-wider text-emerald-700">
+            <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">
               EASY AS 1, 2, 3, 4
             </p>
             <h2 className="text-2xl font-black text-slate-900 mt-1">
               How CouponKodee Cashback Works
             </h2>
-            <p className="text-[15px] text-slate-600 mt-1">
+            <p className="text-md text-slate-600 mt-1">
               Four easy steps to turn your everyday shopping into real savings.
             </p>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-black text-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
                 1
               </div>
               <h3 className="font-bold text-sm text-slate-900 mb-1">Pick a Store</h3>
@@ -148,7 +145,7 @@ export default async function CashbackPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-black text-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
                 2
               </div>
               <h3 className="font-bold text-sm text-slate-900 mb-1">Activate Cashback</h3>
@@ -158,7 +155,7 @@ export default async function CashbackPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-black text-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
                 3
               </div>
               <h3 className="font-bold text-sm text-slate-900 mb-1">Shop as Usual</h3>
@@ -168,7 +165,7 @@ export default async function CashbackPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-black text-lg flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
                 4
               </div>
               <h3 className="font-bold text-sm text-slate-900 mb-1">Withdraw Real Cash</h3>
@@ -184,10 +181,10 @@ export default async function CashbackPage() {
           <section className="mb-12">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-emerald-700">
+                <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   TOP OFFERS
                 </p>
-                <h2 className="text-xl font-black text-slate-900">
+                <h2 className="text-xl font-extrabold text-slate-900">
                   Featured Cashback Deals Today
                 </h2>
               </div>
@@ -204,10 +201,10 @@ export default async function CashbackPage() {
         {/* 4. CASHBACK STORES EXPLORER */}
         <section className="mb-14">
           <div className="mb-6">
-            <p className="text-xs font-black uppercase tracking-wider text-emerald-700">
+            <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">
               EXPLORE PARTNERS
             </p>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-extrabold text-slate-900">
               Stores Offering Cashback ({cashbackStores.length})
             </h2>
             <p className="text-sm text-slate-600 mt-0.5">
@@ -221,7 +218,7 @@ export default async function CashbackPage() {
         {/* 5. FREQUENTLY ASKED QUESTIONS */}
         <section className="max-w-3xl mx-auto pt-6 border-t border-slate-200">
           <div className="text-center mb-8">
-            <p className="text-xs font-black uppercase tracking-wider text-purple-700">
+            <p className="text-xs font-bold uppercase tracking-wider text-purple-700">
               HAVE QUESTIONS?
             </p>
             <h2 className="text-2xl font-black text-slate-900 mt-1">
@@ -240,7 +237,7 @@ export default async function CashbackPage() {
                     <HelpCircle className="h-4 w-4 text-emerald-600 shrink-0" />
                     {faq.q}
                   </span>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-90" />
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-500 transition-transform group-open:rotate-90" />
                 </summary>
                 <div className="mt-3 text-xs text-slate-600 leading-relaxed pl-6 border-t border-slate-100 pt-3">
                   {faq.a}

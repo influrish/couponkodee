@@ -1,4 +1,5 @@
-import Link from "next/link"
+import Link from "@/components/localized-link"
+import type { Metadata } from "next"
 import { NewsletterSignup } from "@/components/newsletter-signup"
 import { HomeHero } from "@/components/home-hero"
 import { HomeDynamicContent } from "@/components/home-dynamic-content"
@@ -37,6 +38,12 @@ import {
 
 // ISR: Revalidate every 60 seconds
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: "CouponKodee | Verified Coupons, Deals & Cashback",
+  description:
+    "Save on every order with verified coupon codes, trending deals and cashback from Amazon, Flipkart, Myntra, Swiggy and 500+ stores.",
+}
 
 interface HomePageProps {
   searchParams: Promise<{ q?: string }>
@@ -100,7 +107,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   let activeCategories = isCashbackEnabled
     ? defaultCategories
     : defaultCategories.filter((c) => c.slug !== "cashback")
-  let popularStoresList = await getDbPopularStores()
+  const popularStoresList = await getDbPopularStores()
 
   try {
     const { getPayloadClient } = await import("@/src/lib/payload")
@@ -260,7 +267,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         searchTerm={searchTerm}
       />
 
-      <div className="container mx-auto px-4">
+      <div className="container">
         {/* 3. CATEGORIES SECTION */}
         <section id="categories" className="section-block section-block--tight">
           <div className="section-heading">
@@ -293,7 +300,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                       loading="eager"
                     />
                   </div>
-                  <span className="text-[13px] sm:text-sm font-extrabold text-slate-800 dark:text-slate-100 text-center leading-tight mt-3 max-w-[96px] sm:max-w-[110px] break-words group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 text-center leading-tight mt-3 max-w-[96px] sm:max-w-[110px] break-words group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
                     {category.name}
                   </span>
                 </Link>
@@ -316,10 +323,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <section id="how-it-works" className="section-block">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <p className="section-kicker justify-center">{siteSettings.howItWorks.kicker || "EASY AS 1, 2, 3"}</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">
+            <h2 className="text-3xl font-extrabold text-slate-900 mt-1">
               {siteSettings.howItWorks.title}
             </h2>
-            <p className="text-[15px] text-slate-600 mt-2">
+            <p className="text-md text-slate-600 mt-2">
               {!isCashbackEnabled
                 ? siteSettings.howItWorks.subtitle.replace(/and automatic cashback tracking\.?/gi, "and instant coupon discounts.")
                 : siteSettings.howItWorks.subtitle}
@@ -349,7 +356,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
               return (
                 <div key={idx} className="step-card flex flex-col items-center text-center">
-                  <div className={`w-14 h-14 rounded-2xl ${colorClass} flex items-center justify-center font-black text-xl mb-4 shadow-sm`}>
+                  <div className={`w-14 h-14 rounded-2xl ${colorClass} flex items-center justify-center font-extrabold text-xl mb-4 shadow-sm`}>
                     {rawStep.stepNumber || idx + 1}
                   </div>
                   <h3 className="font-extrabold text-slate-900 text-base mb-2">{title}</h3>
@@ -366,10 +373,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <section id="faqs" className="section-block">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <p className="section-kicker justify-center">GOT QUESTIONS?</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">
+            <h2 className="text-3xl font-extrabold text-slate-900 mt-1">
               {siteSettings.faqs.title}
             </h2>
-            <p className="text-[15px] text-slate-600 mt-2">
+            <p className="text-md text-slate-600 mt-2">
               {!isCashbackEnabled
                 ? siteSettings.faqs.subtitle.replace(/and earning cashback\.?/gi, "and finding the best discounts.")
                 : siteSettings.faqs.subtitle}
@@ -395,7 +402,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                       <HelpCircle className="h-4 w-4 text-purple-600 shrink-0" />
                       {faq.q}
                     </span>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-90" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-500 transition-transform group-open:rotate-90" />
                   </summary>
                   <div className="mt-3 text-xs text-slate-600 leading-relaxed pl-6.5 border-t border-slate-100 pt-3">
                     {!isCashbackEnabled

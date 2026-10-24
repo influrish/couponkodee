@@ -1,10 +1,14 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { COUNTRIES, CountryInfo, DEFAULT_COUNTRY, getCountryByCode } from "@/lib/countries-data"
+import { REGION_COOKIE, countryCodeToRegion, localizeHref, splitRegion } from "@/lib/regions"
 
 interface CountryContextType {
   country: CountryInfo
+  /** URL prefix for the active country, e.g. "in" or "us". */
+  region: string
   countries: CountryInfo[]
   setCountry: (codeOrCountry: string | CountryInfo) => void
   formatPrice: (amount: number) => string
@@ -12,50 +16,54 @@ interface CountryContextType {
 
 const CountryContext = createContext<CountryContextType>({
   country: DEFAULT_COUNTRY,
+  region: countryCodeToRegion(DEFAULT_COUNTRY.code),
   countries: COUNTRIES,
   setCountry: () => {},
   formatPrice: (val) => `₹${val}`,
 })
 
 const STORAGE_KEY = "couponkodee_country"
-const COOKIE_KEY = "couponkodee_country"
 
-export function CountryProvider({ children }: { children: React.ReactNode }) {
-  const [country, setCountryState] = useState<CountryInfo>(DEFAULT_COUNTRY)
+function persist(code: string) {
+  try {
+    localStorage.setItem(STORAGE_KEY, code)
+    document.cookie = `${REGION_COOKIE}=${code}; path=/; max-age=31536000; SameSite=Lax`
+  } catch {
+    // storage unavailable; the URL still carries the region
+  }
+}
 
-  // 1. Initial hydration from localStorage and/or cookie
+/**
+ * The URL prefix (/in, /us, ...) is the source of truth for the active country.
+ * `initialCode` comes from the middleware so the first render already matches the URL.
+ */
+export function CountryProvider({ initialCode, children }: { initialCode?: string; children: React.ReactNode }) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [country, setCountryState] = useState<CountryInfo>(() => getCountryByCode(initialCode || DEFAULT_COUNTRY.code))
+
+  // Follow client-side navigations between regions (back/forward, region links)
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        setCountryState(getCountryByCode(stored))
-        return
-      }
+    const { region } = splitRegion(pathname || "/")
+    if (!region) return
+    const next = getCountryByCode(region.toUpperCase())
+    setCountryState((current) => (current.code === next.code ? current : next))
+    persist(next.code)
+  }, [pathname])
 
-      // Check cookie
-      const match = document.cookie.match(new RegExp("(^| )" + COOKIE_KEY + "=([^;]+)"))
-      if (match && match[2]) {
-        setCountryState(getCountryByCode(match[2]))
-      }
-    } catch {
-      // ignore storage access errors
-    }
-  }, [])
+  const setCountry = useCallback(
+    (codeOrCountry: string | CountryInfo) => {
+      const next = getCountryByCode(codeOrCountry)
+      setCountryState(next)
+      persist(next.code)
 
-  // 2. Set Country
-  const setCountry = useCallback((codeOrCountry: string | CountryInfo) => {
-    const next = getCountryByCode(codeOrCountry)
-    setCountryState(next)
+      // Swap the region prefix on the current page: /in/stores?x=1 -> /us/stores?x=1
+      const { path } = splitRegion(window.location.pathname)
+      router.push(localizeHref(`${path}${window.location.search}`, countryCodeToRegion(next.code)), { scroll: false })
+    },
+    [router]
+  )
 
-    try {
-      localStorage.setItem(STORAGE_KEY, next.code)
-      document.cookie = `${COOKIE_KEY}=${next.code}; path=/; max-age=31536000; SameSite=Lax`
-    } catch {
-      // ignore storage quota errors
-    }
-  }, [])
-
-  // 3. Format Currency
   const formatPrice = useCallback(
     (amount: number) => {
       if (country.code === "IN") {
@@ -70,7 +78,9 @@ export function CountryProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <CountryContext.Provider value={{ country, countries: COUNTRIES, setCountry, formatPrice }}>
+    <CountryContext.Provider
+      value={{ country, region: countryCodeToRegion(country.code), countries: COUNTRIES, setCountry, formatPrice }}
+    >
       {children}
     </CountryContext.Provider>
   )
@@ -79,4 +89,3 @@ export function CountryProvider({ children }: { children: React.ReactNode }) {
 export function useCountry() {
   return useContext(CountryContext)
 }
-
