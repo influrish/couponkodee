@@ -1,0 +1,9 @@
+{
+  "name": "undici",
+  "version": "7.10.0",
+  "private": true,
+  "description": "Cloudflare Workers shim for undici. The real package compiles WebAssembly (llhttp) at runtime, which Workers forbid. Payload only uses it in uploads/safeFetch.js (URL uploads), so native fetch is used instead.",
+  "type": "module",
+  "main": "index.js",
+  "exports": { ".": "./index.js", "./package.json": "./package.json" }
+}

@@ -37,3 +37,6 @@ next-env.d.ts
 # Playwright output
 /test-results/
 /playwright-report/
+
+# Cloudflare local preview secrets
+.dev.vars*

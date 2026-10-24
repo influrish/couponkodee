@@ -95,3 +95,13 @@ describe("access roles", () => {
     expect(isAdminOrSelf({ req: req() } as any)).toBe(false)
   })
 })
+
+describe("classifyDbError", () => {
+  it("maps database errors to safe categories", async () => {
+    const { classifyDbError } = await import("@/src/lib/db-health")
+    expect(classifyDbError(new Error("bad auth : authentication failed"))).toBe("auth")
+    expect(classifyDbError(new Error("querySrv ENOTFOUND _mongodb._tcp.cluster0.x.mongodb.net"))).toBe("dns")
+    expect(classifyDbError(new Error("Server selection timed out after 3000 ms"))).toBe("network")
+    expect(classifyDbError(new Error("something odd"))).toBe("unknown")
+  })
+})
