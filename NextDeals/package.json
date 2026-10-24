@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--no-deprecation' next dev",
     "build": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=8000' next build",
-    "cf:build": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:build": "opennextjs-cloudflare build --dangerously-use-unsupported-next-version",
+    "preview": "opennextjs-cloudflare build --dangerously-use-unsupported-next-version && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build --dangerously-use-unsupported-next-version && opennextjs-cloudflare deploy",
     "start": "cross-env NODE_ENV=production next start",
     "lint": "next lint",
     "payload": "cross-env NODE_OPTIONS='--no-deprecation' payload dev",
