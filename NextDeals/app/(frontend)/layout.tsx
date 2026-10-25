@@ -12,10 +12,14 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { getHeaderData, getFooterData, getCashbackVisibility } from "@/lib/cms-settings"
 import { headers } from "next/headers"
+import Script from "next/script"
 import { COUNTRIES } from "@/lib/countries-data"
 import { DEFAULT_REGION, FALLBACK_REGION, regionToCountryCode } from "@/lib/regions"
 
 export const dynamic = "force-dynamic"
+
+// Public GA4 measurement ID (not a secret). Override per environment with NEXT_PUBLIC_GA_ID.
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "G-RP1F7CF3RN"
 
 export const viewport: Viewport = {
   themeColor: "#7c3aed",
@@ -68,6 +72,16 @@ export default async function FrontendLayout({ children }: { children: React.Rea
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        {/* Google Analytics 4 */}
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} strategy="afterInteractive" />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`}
+        </Script>
+      </head>
       <body className="min-h-screen bg-background text-foreground antialiased font-sans">
         {/* The storefront is designed light-only; following the OS theme rendered dark text on dark cards. */}
         <ThemeProvider attribute="class" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
