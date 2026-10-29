@@ -8,6 +8,7 @@ import {
   regionToCountryCode,
   splitRegion,
 } from "@/lib/regions"
+import { isStorefrontPath, resolveSplitRoute } from "@/lib/split-hosting"
 
 const ONE_YEAR = 60 * 60 * 24 * 365
 
@@ -18,6 +19,12 @@ const ONE_YEAR = 60 * 60 * 24 * 365
  */
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl
+
+  const route = resolveSplitRoute(pathname, search)
+  if (route.action === "redirect") return NextResponse.redirect(route.url, 307)
+  if (route.action === "proxy") return NextResponse.rewrite(route.url)
+  if (!isStorefrontPath(pathname)) return NextResponse.next()
+
   const { region, path } = splitRegion(pathname)
 
   if (region) {
@@ -49,6 +56,6 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Everything except the CMS, APIs, the /out tracker, media, Next internals and static files
-  matcher: ["/((?!api|admin|out|media|_next|.*\\..*).*)"],
+  // Storefront pages, plus the CMS paths that split hosting redirects or proxies
+  matcher: ["/((?!api|admin|out|media|_next|.*\\..*).*)", "/admin", "/admin/:path*", "/api/:path*", "/media/:path*"],
 }

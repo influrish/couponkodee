@@ -9,6 +9,34 @@
  */
 
 const REQUEST_TIMEOUT_MS = 10_000
+// Matches the storefront pages' revalidate window; admin edits show within a minute.
+const CACHE_TTL_MS = 60_000
+const CACHE_MAX_ENTRIES = 200
+
+const responseCache = new Map<string, { expiresAt: number; value: Promise<unknown> }>()
+
+/** Shares public reads for CACHE_TTL_MS so each page view doesn't wait on the CMS. */
+function cached<T>(key: string, load: () => Promise<T>, now = Date.now()): Promise<T> {
+  const hit = responseCache.get(key)
+  if (hit && hit.expiresAt > now) return hit.value as Promise<T>
+
+  if (responseCache.size >= CACHE_MAX_ENTRIES) {
+    for (const [entryKey, entry] of responseCache) {
+      if (entry.expiresAt <= now) responseCache.delete(entryKey)
+    }
+    if (responseCache.size >= CACHE_MAX_ENTRIES) responseCache.clear()
+  }
+
+  const value = load()
+  responseCache.set(key, { expiresAt: now + CACHE_TTL_MS, value })
+  // Failures are not cached, so the next request retries the CMS.
+  value.catch(() => responseCache.delete(key))
+  return value
+}
+
+export function clearCmsResponseCache(): void {
+  responseCache.clear()
+}
 
 type QueryValue = string | number | boolean | null | undefined | QueryValue[] | { [key: string]: QueryValue }
 
@@ -83,10 +111,13 @@ async function getJson<T>(
 export function createRestPayloadClient(baseUrl: string) {
   return {
     find<T = any>({ collection, where, limit, sort, depth, page }: RestFindArgs): Promise<RestFindResult<T>> {
-      return getJson(baseUrl, encodeURIComponent(collection), { where, limit, sort, depth, page })
+      const path = encodeURIComponent(collection)
+      const query = { where, limit, sort, depth, page }
+      return cached(`${baseUrl}|${path}|${toQueryString(query)}`, () => getJson(baseUrl, path, query))
     },
     findGlobal<T = any>({ slug, depth }: RestFindGlobalArgs): Promise<T> {
-      return getJson(baseUrl, `globals/${encodeURIComponent(slug)}`, { depth })
+      const path = `globals/${encodeURIComponent(slug)}`
+      return cached(`${baseUrl}|${path}|${depth ?? ""}`, () => getJson(baseUrl, path, { depth }))
     },
     /** Resolves the signed-in user from the visitor's own session cookie. */
     async auth({ headers }: { headers: Headers }): Promise<{ user: { id: string } | null }> {

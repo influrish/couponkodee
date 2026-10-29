@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { createRestPayloadClient, getCmsUrl, toQueryString } from "@/src/lib/cms-rest"
+import { clearCmsResponseCache, createRestPayloadClient, getCmsUrl, toQueryString } from "@/src/lib/cms-rest"
 
 describe("toQueryString", () => {
   it("encodes nested and/or where clauses in Payload's bracket notation", () => {
@@ -36,7 +36,10 @@ describe("getCmsUrl", () => {
 })
 
 describe("createRestPayloadClient", () => {
-  afterEach(() => vi.unstubAllGlobals())
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    clearCmsResponseCache()
+  })
 
   it("reads collections from the CMS REST API", async () => {
     const fetchMock = vi.fn().mockResolvedValue(Response.json({ docs: [{ slug: "costco" }], totalDocs: 1 }))
@@ -46,6 +49,30 @@ describe("createRestPayloadClient", () => {
 
     expect(result.docs[0].slug).toBe("costco")
     expect(fetchMock.mock.calls[0][0]).toBe("https://cms.test/api/stores?limit=1")
+  })
+
+  it("reuses a recent response for the same query instead of calling the CMS again", async () => {
+    const fetchMock = vi.fn().mockImplementation(async () => Response.json({ docs: [], totalDocs: 0 }))
+    vi.stubGlobal("fetch", fetchMock)
+    const client = createRestPayloadClient("https://cms.test")
+
+    await client.find({ collection: "stores", limit: 1 })
+    await client.find({ collection: "stores", limit: 1 })
+    await client.find({ collection: "stores", limit: 2 })
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it("does not cache failures, so the next request retries the CMS", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("down", { status: 503 }))
+      .mockResolvedValueOnce(Response.json({ cashbackVisibility: "on" }))
+    vi.stubGlobal("fetch", fetchMock)
+    const client = createRestPayloadClient("https://cms.test")
+
+    await expect(client.findGlobal({ slug: "site-settings" })).rejects.toThrow()
+    await expect(client.findGlobal({ slug: "site-settings" })).resolves.toEqual({ cashbackVisibility: "on" })
   })
 
   it("throws when the CMS responds with an error so callers use their fallbacks", async () => {

@@ -1,44 +1,7 @@
 /** @type {import('next').NextConfig} */
 import path from 'path';
 
-const stripTrailingSlash = (url) => (url || '').trim().replace(/\/+$/, '');
-
-// Set on the Cloudflare storefront: the CMS server (admin, API, database).
-const CMS_URL = stripTrailingSlash(process.env.CMS_URL);
-// Set on the CMS server: the public storefront that visitors should use instead.
-const STOREFRONT_URL = stripTrailingSlash(process.env.STOREFRONT_URL);
-
-// Storefront pages, i.e. everything except the CMS, APIs, tracker, media and static files.
-const STOREFRONT_PATH = '/:path((?!api|admin|_next|media|out|.*\\..*).*)';
-
 const nextConfig = {
-  async redirects() {
-    if (CMS_URL) {
-      return [
-        { source: '/admin', destination: `${CMS_URL}/admin`, permanent: false },
-        { source: '/admin/:path*', destination: `${CMS_URL}/admin/:path*`, permanent: false },
-      ];
-    }
-    if (STOREFRONT_URL) {
-      return [
-        { source: '/', destination: STOREFRONT_URL, permanent: false },
-        { source: STOREFRONT_PATH, destination: `${STOREFRONT_URL}/:path`, permanent: false },
-      ];
-    }
-    return [];
-  },
-  async rewrites() {
-    if (!CMS_URL) return [];
-    // Proxied before the storefront's own routes: logins, forms and media need
-    // the database, which only the CMS server has. /out stays here because a
-    // proxy would follow its redirect instead of sending the visitor on.
-    return {
-      beforeFiles: [
-        { source: '/api/:path*', destination: `${CMS_URL}/api/:path*` },
-        { source: '/media/:path*', destination: `${CMS_URL}/media/:path*` },
-      ],
-    };
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
