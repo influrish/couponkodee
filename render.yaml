@@ -31,5 +31,6 @@ services:
         value: https://couponkodee.com
       - key: MONGODB_URI
         sync: false
+      # Signs admin and shopper login sessions. Only this server needs it.
       - key: PAYLOAD_SECRET
-        sync: false
+        generateValue: true
