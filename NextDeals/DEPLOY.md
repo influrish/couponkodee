@@ -13,7 +13,7 @@ The same code serves both roles. Two variables switch it:
 
 | Variable | Set on | Effect |
 | --- | --- | --- |
-| `CMS_URL` | Cloudflare Worker (runtime variable) | Pages read from the CMS REST API (cached 60 seconds); `/api/*` and `/media/*` are proxied to the CMS; `/admin` redirects to the CMS |
+| `CMS_URL` | Cloudflare Worker (`vars` in `wrangler.jsonc`) | Pages read from the CMS REST API (cached 60 seconds); `/api/*` and `/media/*` are proxied to the CMS; `/admin` redirects to the CMS |
 | `STOREFRONT_URL` | Render (runtime variable, set by `render.yaml`) | Storefront pages on the CMS server redirect to the main site, so it isn't indexed twice |
 
 Both are read on every request (`lib/split-hosting.ts`, called from `middleware.ts`), so changing one takes effect without a rebuild. Leave both empty for local development or a single-server setup.
@@ -42,8 +42,7 @@ Optional: serve the admin at `admin.couponkodee.com`. Add it under the service's
 
 The existing Worker `couponkodee` keeps its domain and GitHub build. In **Workers & Pages → couponkodee → Settings**:
 
-1. **Variables and Secrets:** add `CMS_URL` (type Text) = the Render address from step 2, without a trailing slash, and deploy.
-2. A `CMS_URL` under **Build → Variables** is not needed (harmless if present).
+`CMS_URL` is set in `wrangler.jsonc` (`vars`), so every deploy includes it. Change it there, not in the dashboard: GitHub deploys replace plain-text dashboard variables with the ones in `wrangler.jsonc` (`keep_vars` now preserves other dashboard variables, and secrets are never removed).
 
 `MONGODB_URI` is no longer used by the Worker once `CMS_URL` is set; delete it from the Worker after verifying, so the database password lives only on Render.
 

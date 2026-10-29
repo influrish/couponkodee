@@ -7,6 +7,11 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
+  },
+  // Deploys from GitHub would otherwise delete variables set in the dashboard.
+  "keep_vars": true,
+  "vars": {
+    // CMS server on Render (admin, API, database). See DEPLOY.md.
+    "CMS_URL": "https://couponkodee.onrender.com"
   }
 }
-
