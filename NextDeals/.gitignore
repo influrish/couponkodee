@@ -40,3 +40,4 @@ next-env.d.ts
 
 # Cloudflare local preview secrets
 .dev.vars*
+.media-seed

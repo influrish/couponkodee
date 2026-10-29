@@ -1,0 +1,31 @@
+# Render Blueprint for couponkodee.com (Next.js + Payload CMS on a Node server).
+# Setup steps: NextDeals/DEPLOY.md
+services:
+  - type: web
+    name: couponkodee
+    runtime: node
+    plan: starter
+    region: singapore
+    rootDir: NextDeals
+    # NODE_ENV must not be "production" during install, or devDependencies
+    # (typescript, tailwind, cross-env) are skipped and the build fails.
+    # `pnpm start` sets NODE_ENV=production itself.
+    buildCommand: npx -y pnpm@10 install --frozen-lockfile && npx -y pnpm@10 build && rm -rf .media-seed && cp -R media .media-seed
+    # The persistent disk hides the committed media/ files, so copy any that
+    # are missing onto it before starting. Existing uploads are never overwritten.
+    startCommand: 'mkdir -p media && for f in .media-seed/*; do [ -e "media/${f##*/}" ] || cp -R "$f" media/ || exit 1; done && npm run start'
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: media
+      mountPath: /opt/render/project/src/NextDeals/media
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://couponkodee.com
+      - key: MONGODB_URI
+        sync: false
+      - key: PAYLOAD_SECRET
+        sync: false
