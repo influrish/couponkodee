@@ -1,8 +1,9 @@
-# Render Blueprint for couponkodee.com (Next.js + Payload CMS on a Node server).
+# Render Blueprint for the CouponKodee CMS server: Payload admin, REST API and MongoDB.
+# The public storefront runs on Cloudflare Workers and reads from this server.
 # Setup steps: NextDeals/DEPLOY.md
 services:
   - type: web
-    name: couponkodee
+    name: couponkodee-cms
     runtime: node
     plan: starter
     region: singapore
@@ -24,6 +25,9 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: NEXT_PUBLIC_SITE_URL
+        value: https://couponkodee.com
+      # Storefront pages live on Cloudflare; visitors who reach this server are sent there.
+      - key: STOREFRONT_URL
         value: https://couponkodee.com
       - key: MONGODB_URI
         sync: false

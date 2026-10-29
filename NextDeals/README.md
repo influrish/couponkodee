@@ -3,7 +3,7 @@
 Coupons, deals and cashback storefront with a Payload CMS admin panel.
 
 - **Stack:** Next.js 15 (App Router), React 19, Payload CMS 3.49, MongoDB, Tailwind CSS, pnpm
-- **Production:** Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
+- **Production:** storefront on Cloudflare Workers (OpenNext), admin + API + database on Render (see [DEPLOY.md](DEPLOY.md))
 - **Local:** runs fully offline after the first install (local MongoDB, local media storage)
 
 ## Quick start (local)
@@ -135,13 +135,8 @@ Conventions:
 
 ## Production
 
-**Deploy on a Node host, not Cloudflare Workers.** See [DEPLOY.md](DEPLOY.md). Payload with MongoDB fails on Workers after the first request (shared database connections aren't allowed across requests). Cloudflare is still used for DNS and caching.
+The storefront runs on Cloudflare Workers and the Payload admin, REST API and MongoDB connection run on a Node server (Render). Workers can't keep Payload's MongoDB connection across requests, so the storefront reads data from the CMS server over HTTPS. Setup and environment variables: [DEPLOY.md](DEPLOY.md).
 
-### Legacy: Cloudflare Workers (not supported for the admin)
+Known limitations on the storefront Worker:
 
-Pushing to `main` on `influrish/couponkodee` triggers the Cloudflare build (`pnpm deploy` runs `opennextjs-cloudflare build && deploy`). Required secrets: `MONGODB_URI` (Atlas, with the IP access list allowing Cloudflare egress) and `PAYLOAD_SECRET`. Set `NEXT_PUBLIC_SITE_URL` as a plain variable.
-
-Known production limitations:
-
-- Media uploads use the local `media/` folder, which Workers can't write to. Production uploads need an object-storage adapter (for example R2/S3 via `@payloadcms/storage-s3`).
-- `sharp` (image resizing) isn't available on Workers, so uploaded images aren't resized there.
+- `sharp` (image resizing) isn't available on Workers; uploads happen in the admin on Render, where it is.

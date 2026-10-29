@@ -1,46 +1,67 @@
-# Deploying CouponKodee (Node host + Cloudflare DNS)
+# Deploying CouponKodee (storefront on Cloudflare, admin on Render)
 
-**Why not Cloudflare Workers?** Payload CMS with MongoDB keeps one shared database connection open. Cloudflare Workers don't allow a connection opened by one visitor's request to be reused by the next, so after the first request every page and the admin fail with "Worker's code had hung" (error 1101). The same build runs correctly as a normal Node server, which is how Payload is designed to run. Keep Cloudflare for DNS, SSL and caching, and run the app on a Node host.
+```
+Visitor ──► couponkodee.com (Cloudflare Worker: storefront pages, /out tracker)
+               │  page data over HTTPS, and /api/*, /media/* proxied
+               ▼
+            CMS server on Render (Payload admin, REST API) ──► MongoDB Atlas
+```
 
-Verified: `next start` against the live Atlas database serves `/admin/login`, the storefront and the REST API repeatedly without errors.
+**Why the split?** Payload with MongoDB keeps one shared database connection open. Cloudflare Workers don't allow a connection opened by one request to be reused by the next, so any page that talks to MongoDB fails there with error 1101. The CMS server on Render holds the database connection; the storefront Worker never connects to MongoDB and reads its data from the CMS server's REST API instead.
 
-## 1. Create the service on Render (Blueprint)
+The same code serves both roles. Two variables switch it:
 
-The repo root has a `render.yaml` that sets everything except the two secrets.
+| Variable | Set on | Effect |
+| --- | --- | --- |
+| `CMS_URL` | Cloudflare Worker (build **and** runtime) | Pages read from the CMS REST API; `/api/*` and `/media/*` are proxied to the CMS; `/admin` redirects to the CMS |
+| `STOREFRONT_URL` | Render (set by `render.yaml`) | Storefront pages on the CMS server redirect to the main site, so it isn't indexed twice |
 
-1. In Render: **New → Blueprint**, connect the GitHub repo `influrish/couponkodee`, branch `main`.
-2. Render reads `render.yaml` and proposes a web service `couponkodee` (Starter plan, Singapore, 1 GB disk for media). When asked, enter:
+Leave both empty for local development or a single-server setup.
+
+Verified locally: the CMS under `next start` and the storefront under the Workers runtime (`wrangler dev`) serve every storefront page repeatedly, plus sign-up, login, logout, the contact form, media and `/out`.
+
+## 1. MongoDB Atlas
+
+**Network Access** must allow `0.0.0.0/0` (Render's IPs change). Render lists fixed outbound IPs under the service's **Connect → Outbound** tab if you prefer to restrict access.
+
+## 2. CMS server on Render
+
+1. In Render: **New → Blueprint**, connect the GitHub repo `influrish/couponkodee`, branch `main`. It reads `render.yaml` (service `couponkodee-cms`, Starter plan, Singapore, 1 GB disk for media).
+2. Enter the two secrets when asked:
 
 | Variable | Value |
 | --- | --- |
 | `MONGODB_URI` | Atlas address, with the password URL-encoded (`@` → `%40`, `#` → `%23`) and `/couponkodee` before the `?` |
-| `PAYLOAD_SECRET` | the same value the Worker used, or existing logins stop working. A new one is fine if everyone can log in again |
+| `PAYLOAD_SECRET` | the same value the Cloudflare Worker uses, so existing logins keep working |
 
 3. Click **Apply**. The first build takes about 5 to 10 minutes.
-4. Open the service's URL shown at the top of its Render page (for example `https://couponkodee.onrender.com`) and check `/api/health` and `/admin`. Both must work before you move the domain.
+4. Open the URL Render shows (for example `https://couponkodee-cms.onrender.com`) and check `/api/health` shows `connected` and `/admin` shows the login form.
 
 Do **not** add `NODE_ENV=production` as a variable: it makes the install skip build tools and the build fails. The start command sets it.
 
-## 2. Allow Render in MongoDB Atlas
+Optional: serve the admin at `admin.couponkodee.com`. Add it under the service's **Settings → Custom Domains**, add a proxied `CNAME admin → couponkodee-cms.onrender.com` in Cloudflare DNS, and use that address as `CMS_URL` below.
 
-Do this before clicking **Apply** in step 1 (it is probably already set, since the Worker connects from changing IPs). Atlas → **Network Access → Add IP Address → Allow access from anywhere** (`0.0.0.0/0`). Render's outbound IPs are listed under the service's **Connect → Outbound** tab if you prefer to restrict access.
+## 3. Storefront on Cloudflare Workers
 
-## 3. Point the domain
+The existing Worker `couponkodee` keeps its domain and GitHub build. In **Workers & Pages → couponkodee → Settings**:
 
-In Cloudflare **DNS → Records**:
+1. **Variables and Secrets:** add `CMS_URL` (type Text) = the Render address from step 2, without a trailing slash.
+2. **Build → Variables and secrets:** add the same `CMS_URL`. The build needs it too, because the routing to the CMS is fixed at build time.
+3. **Deployments:** retry the latest build (or push to `main`).
 
-1. Remove the Worker's custom domains (Workers & Pages → couponkodee → Domains) so they don't conflict.
-2. Add a `CNAME` for `couponkodee.com` (and `www`) pointing to the service's `.onrender.com` host, **Proxied** (orange cloud). Cloudflare flattens a root CNAME automatically.
-3. In Render → the service → **Settings → Custom Domains**, add `couponkodee.com` and `www.couponkodee.com`, then in Cloudflare set SSL/TLS mode to **Full (strict)**.
+`MONGODB_URI` is no longer used by the Worker once `CMS_URL` is set; delete it from the Worker after verifying, so the database password lives only on Render.
 
 ## 4. Verify
 
-- `https://couponkodee.com/api/health` shows `connected`
-- `https://couponkodee.com/admin` shows the login form
-- Create/edit a store in the admin and confirm it appears on the site (pages revalidate within 60 seconds)
+- `https://couponkodee.com/in` and a store page show live data
+- `https://couponkodee.com/admin` redirects to the Render admin, and you can log in there
+- Create or edit a store in the admin and confirm it appears on the site (pages revalidate within 60 seconds)
+- Sign in on the storefront, and click a "Get deal" button: it should open the store's site
 
 ## Notes
 
-- **Media uploads** are kept on the Render disk mounted at `NextDeals/media`. On start, images committed to the repo are copied onto the disk if missing; existing uploads are never overwritten. A disk means one instance and a few seconds of downtime per deploy.
-- The Cloudflare Worker deploy scripts (`pnpm cf:build`, `pnpm deploy`) remain in `package.json` but are not supported for production for the reason above. Disconnect the Worker's GitHub build once the Node host is live.
+- **Media uploads** are kept on the Render disk mounted at `NextDeals/media`. On start, images committed to the repo are copied onto the disk if missing; existing uploads are never overwritten. The storefront serves them through the `/media/*` and `/api/media/*` proxy. A disk means one Render instance and a few seconds of admin downtime per deploy.
+- **If Render is down**, storefront pages fall back to the built-in sample stores, and sign-in and forms stop working until it is back.
+- `/out` runs on the Worker on purpose: a proxy would follow the redirect itself instead of sending the visitor to the store. It asks the CMS who the signed-in visitor is to attach their sub-ID.
+- The Worker build still needs `--dangerously-use-unsupported-next-version` (already in `package.json`) until the project moves to Next.js 16.
 - Rotate the Atlas database password and `PAYLOAD_SECRET` if they were ever shared in chat or tickets.

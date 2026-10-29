@@ -1,5 +1,5 @@
 import { getPayload, type Payload } from 'payload'
-import payloadConfig from '../payload.config'
+import { createRestPayloadClient, getCmsUrl } from './cms-rest'
 import { isDatabaseConfigured } from './db-config'
 import { isDatabaseReachable } from './db-health'
 
@@ -21,6 +21,14 @@ if (!cached) {
 type InitOptions = Parameters<typeof getPayload>[0]
 
 export const getPayloadClient = async (initOptions?: Partial<InitOptions>): Promise<Payload> => {
+  // Storefront on Cloudflare: read from the CMS server instead of MongoDB.
+  // Only find, findGlobal and auth exist there; writes, logins and /admin are
+  // routed to the CMS server by next.config.mjs, so they never reach this client.
+  const cmsUrl = getCmsUrl()
+  if (cmsUrl) {
+    return createRestPayloadClient(cmsUrl) as unknown as Payload
+  }
+
   if (!isDatabaseConfigured()) {
     throw new Error('MONGODB_URI is missing or invalid; set it in .env.local (see .env.example)')
   }
@@ -45,6 +53,7 @@ export const getPayloadClient = async (initOptions?: Partial<InitOptions>): Prom
   }
 
   if (!cached.promise) {
+    const { default: payloadConfig } = await import('../payload.config')
     cached.promise = getPayload({
       config: payloadConfig,
       ...(initOptions as any),
