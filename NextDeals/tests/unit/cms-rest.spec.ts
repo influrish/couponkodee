@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { clearCmsResponseCache, createRestPayloadClient, getCmsUrl, toQueryString } from "@/src/lib/cms-rest"
+import { clearCmsCache } from "@/src/lib/cms-cache"
+import { createRestPayloadClient, getCmsUrl, toQueryString } from "@/src/lib/cms-rest"
 
 describe("toQueryString", () => {
   it("encodes nested and/or where clauses in Payload's bracket notation", () => {
@@ -38,7 +39,7 @@ describe("getCmsUrl", () => {
 describe("createRestPayloadClient", () => {
   afterEach(() => {
     vi.unstubAllGlobals()
-    clearCmsResponseCache()
+    clearCmsCache()
   })
 
   it("reads collections from the CMS REST API", async () => {

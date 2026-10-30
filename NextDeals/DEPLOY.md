@@ -13,7 +13,7 @@ The same code serves both roles. Two variables switch it:
 
 | Variable | Set on | Effect |
 | --- | --- | --- |
-| `CMS_URL` | Cloudflare Worker (`vars` in `wrangler.jsonc`) | Pages read from the CMS REST API (cached 60 seconds); `/api/*` and `/media/*` are proxied to the CMS; `/admin` redirects to the CMS |
+| `CMS_URL` | Cloudflare Worker (`vars` in `wrangler.jsonc`) | Pages read from the CMS REST API, cached by `src/lib/cms-cache.ts` (fresh 60 seconds, then served stale while refreshing in the background, shared per Cloudflare data center); `/api/*` and `/media/*` are proxied to the CMS; `/admin` redirects to the CMS |
 | `STOREFRONT_URL` | Render (runtime variable, set by `render.yaml`) | Storefront pages on the CMS server redirect to the main site, so it isn't indexed twice |
 
 Both are read on every request (`lib/split-hosting.ts`, called from `middleware.ts`), so changing one takes effect without a rebuild. Leave both empty for local development or a single-server setup.
@@ -56,7 +56,7 @@ The existing Worker `couponkodee` keeps its domain and GitHub build. In **Worker
 ## Notes
 
 - **Media uploads** are kept on the Render disk mounted at `NextDeals/media`. On start, images committed to the repo are copied onto the disk if missing; existing uploads are never overwritten. The storefront serves them through the `/media/*` and `/api/media/*` proxy. A disk means one Render instance and a few seconds of admin downtime per deploy.
-- **If Render is down**, storefront pages fall back to the built-in sample stores, and sign-in and forms stop working until it is back.
+- **If Render is down or asleep**, storefront pages keep showing the last data they fetched (up to 24 hours old), falling back to the built-in sample stores only when nothing is cached. Sign-in and forms stop working until it is back.
 - `/out` runs on the Worker on purpose: a proxy would follow the redirect itself instead of sending the visitor to the store. It asks the CMS who the signed-in visitor is to attach their sub-ID.
 - The Worker build still needs `--dangerously-use-unsupported-next-version` (already in `package.json`) until the project moves to Next.js 16.
 - Rotate the Atlas database password and `PAYLOAD_SECRET` if they were ever shared in chat or tickets.

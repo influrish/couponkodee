@@ -9,7 +9,7 @@ import { DealCard } from "@/components/deal-card"
 import { StoreOfferCard } from "@/components/store-offer-card"
 import { getSiteSettingsData } from "@/lib/cms-settings"
 import { getAllStores, getStoreOffers } from "@/lib/stores-data"
-import { getDbStores, getDbPopularStores } from "@/lib/db-stores"
+import { getDbStores } from "@/lib/db-stores"
 import { getBrandLogo } from "@/lib/brand-logos"
 import { getCategoryImageUrl } from "@/lib/category-images"
 import {
@@ -107,7 +107,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   let activeCategories = isCashbackEnabled
     ? defaultCategories
     : defaultCategories.filter((c) => c.slug !== "cashback")
-  const popularStoresList = await getDbPopularStores()
 
   try {
     const { getPayloadClient } = await import("@/src/lib/payload")
@@ -122,18 +121,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         }
       : { "status.isActive": { equals: true } }
 
-    // 1. Featured Deals from DB (Prioritize isFeatured)
-    const prodResult = await payload.find({
-      collection: "products",
-      where: {
-        and: [productFilter, { "status.isActive": { equals: true } }],
-      },
-      limit: 8,
-      sort: ["-status.isFeatured", "-createdAt"],
-    })
-    featuredProducts = prodResult.docs
-
-    // 2. Verified Coupons from DB (Prioritize isFeatured)
     const couponFilter: any = searchTerm
       ? {
           or: [
@@ -144,32 +131,42 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         }
       : { isActive: { equals: true } }
 
-    const couponResult = await payload.find({
-      collection: "coupon-offers",
-      where: {
-        and: [couponFilter, { isActive: { equals: true } }],
-      },
-      limit: 8,
-      sort: ["-isFeatured", "-sortOrder", "-createdAt"],
-    })
+    // Independent queries, fetched in parallel: featured deals, verified coupons,
+    // cashback offers and categories (featured items first)
+    const [prodResult, couponResult, cashResult, catResult] = await Promise.all([
+      payload.find({
+        collection: "products",
+        where: {
+          and: [productFilter, { "status.isActive": { equals: true } }],
+        },
+        limit: 8,
+        sort: ["-status.isFeatured", "-createdAt"],
+      }),
+      payload.find({
+        collection: "coupon-offers",
+        where: {
+          and: [couponFilter, { isActive: { equals: true } }],
+        },
+        limit: 8,
+        sort: ["-isFeatured", "-sortOrder", "-createdAt"],
+      }),
+      payload.find({
+        collection: "cashback-offers",
+        where: { isActive: { equals: true } },
+        limit: 6,
+        sort: ["-isFeatured", "-sortOrder", "-createdAt"],
+      }),
+      payload.find({
+        collection: "categories",
+        where: { isActive: { equals: true } },
+        limit: 12,
+        sort: ["level", "sortOrder", "name"],
+      }),
+    ])
+    featuredProducts = prodResult.docs
     coupons = couponResult.docs
-
-    // 3. Cashback Offers from DB (Prioritize isFeatured)
-    const cashResult = await payload.find({
-      collection: "cashback-offers",
-      where: { isActive: { equals: true } },
-      limit: 6,
-      sort: ["-isFeatured", "-sortOrder", "-createdAt"],
-    })
     cashbacks = cashResult.docs
 
-    // 4. Categories from DB
-    const catResult = await payload.find({
-      collection: "categories",
-      where: { isActive: { equals: true } },
-      limit: 12,
-      sort: ["level", "sortOrder", "name"],
-    })
     if (catResult.docs.length > 0) {
       const seen = new Set<string>()
       const list: any[] = []

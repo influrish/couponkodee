@@ -247,23 +247,57 @@ export async function getDbStoreBySlug(slug: string, isCashbackEnabled?: boolean
       // Fetch dynamic offers from DB for this store
       const dbOffers: StoreOffer[] = []
 
-      // 1. Coupon offers
-      const couponResult = await payload.find({
-        collection: "coupon-offers",
-        where: {
-          and: [
-            {
-              or: [
-                { merchantSlug: { equals: normalized } },
-                { store: { equals: doc.id } },
-              ],
-            },
-            { isActive: { equals: true } },
-          ],
-        },
-        limit: 50,
-        sort: ["-sortOrder", "-createdAt"],
-      })
+      // Coupons, deals and cashback for this store, fetched in parallel
+      const [couponResult, dealsResult, cashbackResult] = await Promise.all([
+        payload.find({
+          collection: "coupon-offers",
+          where: {
+            and: [
+              {
+                or: [
+                  { merchantSlug: { equals: normalized } },
+                  { store: { equals: doc.id } },
+                ],
+              },
+              { isActive: { equals: true } },
+            ],
+          },
+          limit: 50,
+          sort: ["-sortOrder", "-createdAt"],
+        }),
+        payload.find({
+          collection: "products",
+          where: {
+            and: [
+              {
+                or: [
+                  { merchant: { equals: normalized } },
+                  { store: { equals: doc.id } },
+                ],
+              },
+              { "status.isActive": { equals: true } },
+            ],
+          },
+          limit: 50,
+          sort: "-createdAt",
+        }),
+        payload.find({
+          collection: "cashback-offers",
+          where: {
+            and: [
+              {
+                or: [
+                  { merchantSlug: { equals: normalized } },
+                  { store: { equals: doc.id } },
+                ],
+              },
+              { isActive: { equals: true } },
+            ],
+          },
+          limit: 20,
+          sort: ["-sortOrder", "-createdAt"],
+        }),
+      ])
 
       for (const c of couponResult.docs as any[]) {
         dbOffers.push({
@@ -280,24 +314,6 @@ export async function getDbStoreBySlug(slug: string, isCashbackEnabled?: boolean
         })
       }
 
-      // 2. Deals / Products
-      const dealsResult = await payload.find({
-        collection: "products",
-        where: {
-          and: [
-            {
-              or: [
-                { merchant: { equals: normalized } },
-                { store: { equals: doc.id } },
-              ],
-            },
-            { "status.isActive": { equals: true } },
-          ],
-        },
-        limit: 50,
-        sort: "-createdAt",
-      })
-
       for (const d of dealsResult.docs as any[]) {
         const disc = d.pricing?.discountPercentage ? `${d.pricing.discountPercentage}% OFF` : "DEAL"
         dbOffers.push({
@@ -311,24 +327,6 @@ export async function getDbStoreBySlug(slug: string, isCashbackEnabled?: boolean
           countries: d.countries,
         })
       }
-
-      // 3. Cashback Offers
-      const cashbackResult = await payload.find({
-        collection: "cashback-offers",
-        where: {
-          and: [
-            {
-              or: [
-                { merchantSlug: { equals: normalized } },
-                { store: { equals: doc.id } },
-              ],
-            },
-            { isActive: { equals: true } },
-          ],
-        },
-        limit: 20,
-        sort: ["-sortOrder", "-createdAt"],
-      })
 
       for (const cb of cashbackResult.docs as any[]) {
         dbOffers.push({

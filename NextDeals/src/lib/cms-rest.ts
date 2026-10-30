@@ -6,37 +6,12 @@
  * storefront pages keep calling `payload.find` / `payload.findGlobal` and get
  * the same response shapes over HTTPS. Only publicly readable data is fetched,
  * apart from `auth`, which asks the CMS who the visitor's own cookie belongs to.
+ * Public reads go through cms-cache.ts, so most page views never wait on the CMS.
  */
 
+import { cachedRead } from "./cms-cache"
+
 const REQUEST_TIMEOUT_MS = 10_000
-// Matches the storefront pages' revalidate window; admin edits show within a minute.
-const CACHE_TTL_MS = 60_000
-const CACHE_MAX_ENTRIES = 200
-
-const responseCache = new Map<string, { expiresAt: number; value: Promise<unknown> }>()
-
-/** Shares public reads for CACHE_TTL_MS so each page view doesn't wait on the CMS. */
-function cached<T>(key: string, load: () => Promise<T>, now = Date.now()): Promise<T> {
-  const hit = responseCache.get(key)
-  if (hit && hit.expiresAt > now) return hit.value as Promise<T>
-
-  if (responseCache.size >= CACHE_MAX_ENTRIES) {
-    for (const [entryKey, entry] of responseCache) {
-      if (entry.expiresAt <= now) responseCache.delete(entryKey)
-    }
-    if (responseCache.size >= CACHE_MAX_ENTRIES) responseCache.clear()
-  }
-
-  const value = load()
-  responseCache.set(key, { expiresAt: now + CACHE_TTL_MS, value })
-  // Failures are not cached, so the next request retries the CMS.
-  value.catch(() => responseCache.delete(key))
-  return value
-}
-
-export function clearCmsResponseCache(): void {
-  responseCache.clear()
-}
 
 type QueryValue = string | number | boolean | null | undefined | QueryValue[] | { [key: string]: QueryValue }
 
@@ -88,14 +63,12 @@ export function getCmsUrl(): string | null {
   return /^https?:\/\//.test(url) ? url : null
 }
 
-async function getJson<T>(
-  baseUrl: string,
-  path: string,
-  query: Record<string, QueryValue>,
-  extraHeaders: Record<string, string> = {},
-): Promise<T> {
+function buildUrl(baseUrl: string, path: string, query: Record<string, QueryValue>): string {
   const queryString = toQueryString(query)
-  const url = `${baseUrl}/api/${path}${queryString ? `?${queryString}` : ""}`
+  return `${baseUrl}/api/${path}${queryString ? `?${queryString}` : ""}`
+}
+
+async function getJson<T>(url: string, extraHeaders: Record<string, string> = {}): Promise<T> {
   const response = await fetch(url, {
     headers: { Accept: "application/json", ...extraHeaders },
     cache: "no-store",
@@ -103,7 +76,7 @@ async function getJson<T>(
   })
 
   if (!response.ok) {
-    throw new Error(`CMS request failed: ${response.status} ${response.statusText} for /api/${path}`)
+    throw new Error(`CMS request failed: ${response.status} ${response.statusText} for ${new URL(url).pathname}`)
   }
   return (await response.json()) as T
 }
@@ -111,19 +84,18 @@ async function getJson<T>(
 export function createRestPayloadClient(baseUrl: string) {
   return {
     find<T = any>({ collection, where, limit, sort, depth, page }: RestFindArgs): Promise<RestFindResult<T>> {
-      const path = encodeURIComponent(collection)
-      const query = { where, limit, sort, depth, page }
-      return cached(`${baseUrl}|${path}|${toQueryString(query)}`, () => getJson(baseUrl, path, query))
+      const url = buildUrl(baseUrl, encodeURIComponent(collection), { where, limit, sort, depth, page })
+      return cachedRead(url, () => getJson(url))
     },
     findGlobal<T = any>({ slug, depth }: RestFindGlobalArgs): Promise<T> {
-      const path = `globals/${encodeURIComponent(slug)}`
-      return cached(`${baseUrl}|${path}|${depth ?? ""}`, () => getJson(baseUrl, path, { depth }))
+      const url = buildUrl(baseUrl, `globals/${encodeURIComponent(slug)}`, { depth })
+      return cachedRead(url, () => getJson(url))
     },
     /** Resolves the signed-in user from the visitor's own session cookie. */
     async auth({ headers }: { headers: Headers }): Promise<{ user: { id: string } | null }> {
       const cookie = headers.get("cookie")
       if (!cookie) return { user: null }
-      const { user } = await getJson<{ user: { id: string } | null }>(baseUrl, "users/me", {}, { Cookie: cookie })
+      const { user } = await getJson<{ user: { id: string } | null }>(buildUrl(baseUrl, "users/me", {}), { Cookie: cookie })
       return { user: user ?? null }
     },
   }
