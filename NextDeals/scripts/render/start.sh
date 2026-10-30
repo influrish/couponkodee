@@ -13,4 +13,11 @@ else
   echo "No .media-seed folder; skipping media seeding (check the Build Command runs scripts/render/build.sh)."
 fi
 
+# One-off admin password reset for hosts without a shell: set SEED_ADMIN_EMAIL
+# and SEED_ADMIN_PASSWORD, deploy once, then delete both variables.
+if [ -n "${SEED_ADMIN_EMAIL:-}" ] && [ -n "${SEED_ADMIN_PASSWORD:-}" ]; then
+  echo "SEED_ADMIN_EMAIL is set: resetting the password for ${SEED_ADMIN_EMAIL}. Delete SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD afterwards."
+  npm run admin:reset-password || echo "Admin password reset failed (see error above); starting the server anyway."
+fi
+
 exec npm run start
